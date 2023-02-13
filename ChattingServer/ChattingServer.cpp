@@ -17,7 +17,7 @@
 
 using namespace std;
 
-string charVecToStr(vector<char> &c) 
+string charVecToStr(vector<char> &c) //안씀
 {
 	string str = "";
 	for (int i = 0;i < c.size();i++)
@@ -88,9 +88,7 @@ int main()
 	FD_ZERO(&reads);//인자로 전달된 주소의 fd_set형 변수의 모든 비트를 0으로 초기화 함
 	FD_SET(servSock, &reads); //&reads주소의 변수에 1번 인자로 전달된 파일 디스크립터 정보를 등록함
 
-	//char buf[BUF_SIZE];// 클라이언트의 문자열을 받아 저장할 배열생성 (while문 안에서 생성하면 클라가 입력한 값들이 다 timeout돌면서 초기화돼서 사라짐)
-
-	vector<char> buf;
+	string buf;// 클라이언트의 문자열을 받아 저장할 string생성 (while문 안에서 생성하면 클라가 입력한 값들이 다 timeout돌면서 초기화돼서 사라짐)
 	char c;
 
 	while (1)
@@ -128,7 +126,7 @@ int main()
 					FD_SET(clntSock, &reads);//reads는 FD_set 배열임. 이 배열의 clntSock 인덱스가0 에서 1 로 바뀔듯
 
 					cout << "client  연결 성공. clntSock: " << clntSock << endl;
-					string msg = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 ! "; //\r 은 현재 줄의 맨 앞으로 커서를 옮겨줌. 다음 줄의 맨 앞부터 쓰고 싶다면 \n하고 \r하는 것 추천
+					string msg = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 !\n\r "; //\r 은 현재 줄의 맨 앞으로 커서를 옮겨줌. 다음 줄의 맨 앞부터 쓰고 싶다면 \n하고 \r하는 것 추천
 					send(clntSock, msg.c_str(), int(msg.size()), 0);    // c_str 는 string을 char * 로 변환
 				}
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
@@ -140,26 +138,27 @@ int main()
 						FD_CLR(reads.fd_array[i], &reads);
 						closesocket(cpyReads.fd_array[i]);
 						cout << "closed client:" << cpyReads.fd_array[i] << endl;
-						//printf("closed client: %d \n", cpyReads.fd_array[i]);
 					}
 					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
-						string strBuf = charVecToStr(buf);//먼저 buf를 string으로 바꿔줘야 함 그 다음 split할것
-						vector<string> message = split(strBuf, ' ');
-						cout << "message 는 " << message[0] << endl;
 
-						cout << "user.GetState() = " << manager.userAry[reads.fd_array[i]].GetState() << endl;
+						string strBuf = buf.substr(0, buf.length() - 1);// 뒤에 자동으로 오는 \r을 제거
+						vector<string> message = split(strBuf, ' ');
+						cout << "strBuf 는" << strBuf << "입니다."<<endl;
+
+						//cout << "user.GetState() = " << manager.userAry[reads.fd_array[i]].GetState() << endl;
 						if (manager.userAry[reads.fd_array[i]].GetState() == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
 						{
 							if (message.size() > 1 && message[0] == "LOGIN" && message[1].length() > 0)
 							{
 								//@@여기서 유저의 ID를 저장해야하는데 소켓번호밖에 모름. 소켓번호로 유저를 찾아야 함
 								//user.SetID(message[1])
-								string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)";
+								/*string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
 								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
 								cout << "User ID : " << message[1] << endl;
 								manager.userAry[reads.fd_array[i]].SetID(message[1]);
-								manager.userAry[reads.fd_array[i]].SetState(State::LOBBY);
+								manager.userAry[reads.fd_array[i]].SetState(State::LOBBY);*/
+								manager.LogIn(reads.fd_array[i], message[1]);
 							}
 							else //로그인 실패
 							{
@@ -175,28 +174,47 @@ int main()
 						}
 						else if (manager.userAry[reads.fd_array[i]].GetState() == State::LOBBY)
 						{
-							cout << "새 명령 = " << message[0] << endl;
+							cout << "새 명령은" << message[0] <<"입니다" <<endl;
 							if (message[0].length() == 1 && message[0] == string("H"))
 							{
-								string msg = "---------------------------------------------------------------\n\rH                         명령어 안내\n\rUS                        이용자 목록 보기\n\rLT                        대화방 목록 보기";
-								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+								manager.H(reads.fd_array[i]);
 							}
-							else if (message[0] == "US")
+							else if (message[0].compare("US") == 0) // compare() : 같으면 0 , 다르면 -1 리턴
 							{
-								string msg =  "US 실행" ;
-								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+								manager.US(reads.fd_array[i]);
 							}
-							else if (message[0] == "X")
+							else if (message[0].compare("LT") == 0)
 							{
-								string msg = "X 실행";
-								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+								manager.LT(reads.fd_array[i]);
+							}
+							else if (message[0].compare("ST") == 0)
+							{
+								manager.ST(reads.fd_array[i]);
+							}
+							else if (message[0].compare("PF") == 0)
+							{
+								manager.PF(reads.fd_array[i]);
+							}
+							else if (message[0].compare("TO") == 0)
+							{
+								manager.TO(reads.fd_array[i]);
+							}
+							else if (message[0].compare("O") == 0)
+							{
+								manager.O(reads.fd_array[i]);
+							}
+							else if (message[0].compare("J") == 0)
+							{
+								manager.J(reads.fd_array[i]);
+							}
+							else if (message[0].compare("X") == 0)
+							{
+								manager.X(reads.fd_array[i]);
 							}
 							else
 							{
-								string msg = "아직 없는 명령";
-								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+								manager.NotExistingCommend(reads.fd_array[i]);
 							}
-
 						}
 						else{}
 						buf.clear();
@@ -208,7 +226,7 @@ int main()
 						//지금은 여기서 문자 하나 받자마자 바로 답함 이걸 고쳐야 함
 						//const char c[] = "LOG IN [사용자 이름] 으로 로그인 해주세요\n";
 						//send(reads.fd_array[i], c, int(strlen(c)), 0);    // echo!
-						buf.push_back(c);
+						buf+=c;
 					}
 				}
 			}
