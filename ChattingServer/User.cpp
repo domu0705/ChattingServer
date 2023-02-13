@@ -3,12 +3,12 @@
 
 User::User()
 {
-	state = Waiting;
+	state = WAITING;
 }
 User::User(SOCKET _socketNum)
 {
 	socketNum = _socketNum;
-	state = Waiting;
+	state = WAITING;
 }
 
 State User::GetState()
@@ -19,6 +19,7 @@ State User::GetState()
 void User::SetState(State newState)
 {
 	state = newState;
+	cout << "SetState = " << state << endl;
 }
 
 string User::GetID()

@@ -134,8 +134,7 @@ int main()
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
 				{		//단 이경우에도 수신한 데이터가 문자열 데이터인지 or 연결종료를 의미하는 EOF인지 확인해야 함
 					strLen = recv(reads.fd_array[i], &c, sizeof(char), 0);
-					User user = manager.GetUserFromSock(reads.fd_array[i]);
-	
+
 					if (strLen == 0)    // close request!
 					{
 						FD_CLR(reads.fd_array[i], &reads);
@@ -149,16 +148,18 @@ int main()
 						vector<string> message = split(strBuf, ' ');
 						cout << "message 는 " << message[0] << endl;
 
-						if (user.GetState() == State::Waiting) // LOGIN 이전의 상태. 로그인해야함
+						cout << "user.GetState() = " << manager.userAry[reads.fd_array[i]].GetState() << endl;
+						if (manager.userAry[reads.fd_array[i]].GetState() == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
 						{
-							if (message.size()>1 && message[0] == "LOGIN" && message[1].length()>0)
+							if (message.size() > 1 && message[0] == "LOGIN" && message[1].length() > 0)
 							{
 								//@@여기서 유저의 ID를 저장해야하는데 소켓번호밖에 모름. 소켓번호로 유저를 찾아야 함
 								//user.SetID(message[1])
 								string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)";
 								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
 								cout << "User ID : " << message[1] << endl;
-								user.SetID(message[1]);
+								manager.userAry[reads.fd_array[i]].SetID(message[1]);
+								manager.userAry[reads.fd_array[i]].SetState(State::LOBBY);
 							}
 							else //로그인 실패
 							{
@@ -166,13 +167,40 @@ int main()
 									cout << "message.size()=" << message.size() << " message[0]=" << message[0] << " message[1] = " << message[1] << endl;
 								}
 								else
-									cout << "message.size()=" << message.size() << " message[0]=" << message[0]  << endl;
+									cout << "message.size()=" << message.size() << " message[0]=" << message[0] << endl;
 								string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.";
 								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
-								buf.clear();//클라가 로그인을 잘못 쳤기 때문에 필요없는 정보 버림
 							}
 
 						}
+						else if (manager.userAry[reads.fd_array[i]].GetState() == State::LOBBY)
+						{
+							cout << "새 명령 = " << message[0] << endl;
+							if (message[0].length() == 1 && message[0] == string("H"))
+							{
+								string msg = "---------------------------------------------------------------\n\rH                         명령어 안내\n\rUS                        이용자 목록 보기\n\rLT                        대화방 목록 보기";
+								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+							}
+							else if (message[0] == "US")
+							{
+								string msg =  "US 실행" ;
+								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+							}
+							else if (message[0] == "X")
+							{
+								string msg = "X 실행";
+								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+							}
+							else
+							{
+								string msg = "아직 없는 명령";
+								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+							}
+
+						}
+						else{}
+						buf.clear();
+
 
 					}
 					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)

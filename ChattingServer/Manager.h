@@ -11,13 +11,27 @@
 
 using namespace std;
 
+enum Command
+{
+	H,
+	US,
+	LT,
+	ST,
+	PF,
+	TO,
+	O,
+	J,
+	X
+};
+
 class Manager
 {
 private:
-	map<SOCKET, User> userSockAry;
 	//socket과 client 묶을 자료형
 
 public:
+	map<SOCKET, User> userAry;
+
 	Manager();
 	User GetUserFromSock(SOCKET sockNum);
 	void SetUserToUserSockAry(SOCKET sockNum,User user);

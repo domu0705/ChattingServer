@@ -15,9 +15,9 @@ using namespace std;
 
 enum State
 {
-	Waiting,
-	LoggedIn,
-	Room
+	WAITING,
+	LOBBY,
+	ROOM
 };
 
 class User
