@@ -1,26 +1,32 @@
-// -----------------------------------------------------------------------------------
-//  사용자의 상태 관리
-// -----------------------------------------------------------------------------------
 #include "USER.h"
 
 
-USER::USER(SOCKET _socketNum)
+User::User()
+{
+	state = Waiting;
+}
+User::User(SOCKET _socketNum)
 {
 	socketNum = _socketNum;
-	isLogIn = false;
+	state = Waiting;
 }
 
-bool USER::GetIsLogIn()
+State User::GetState()
 {
-	return isLogIn;
+	return state;
 }
 
-string USER::GetID()
+void User::SetState(State newState)
+{
+	state = newState;
+}
+
+string User::GetID()
 {
 	return ID;
 }
 
-void USER::SetID(string id)
+void User::SetID(string id)
 {
 	ID = id;
 	return;

@@ -13,17 +13,26 @@
 
 using namespace std;
 
-class USER
+enum State
+{
+	Waiting,
+	LoggedIn,
+	Room
+};
+
+class User
 {
 private:
 	SOCKET socketNum;
-	bool isLogIn;
+	State state;
 	string ID;
 
 public:
-	USER(SOCKET socketNum);
+	User();
+	User(SOCKET socketNum);
 
-	bool GetIsLogIn();
+	State GetState();
+	void SetState(State newState);
 	string GetID();
 	void SetID(string ID);
 

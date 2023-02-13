@@ -2,7 +2,7 @@
 //  서버와 클라이언트의 연결 및 입출력을 관리
 // -----------------------------------------------------------------------------------
 #include "USER.h"
-
+#include "Manager.h"
 #pragma comment(lib, "Ws2_32.lib")
 
 #include <winsock2.h>
@@ -44,6 +44,7 @@ vector<string> split(string str, char Delimiter) {
 
 int main()
 {
+	Manager manager;
 	WSADATA	wsaData;//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
 	SOCKET servSock, clntSock;
 	SOCKADDR_IN servAddr, clntAddr;//68p
@@ -121,7 +122,9 @@ int main()
 				{
 					adrSz = sizeof(clntAddr);
 					clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
-					USER user(clntSock);//유저와 소켓 연결 정보 저장
+					User user(clntSock);//유저와 소켓 연결 정보 저장
+					manager.SetUserToUserSockAry(clntSock, user);
+
 					FD_SET(clntSock, &reads);//reads는 FD_set 배열임. 이 배열의 clntSock 인덱스가0 에서 1 로 바뀔듯
 
 					cout << "client  연결 성공. clntSock: " << clntSock << endl;
@@ -131,6 +134,7 @@ int main()
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
 				{		//단 이경우에도 수신한 데이터가 문자열 데이터인지 or 연결종료를 의미하는 EOF인지 확인해야 함
 					strLen = recv(reads.fd_array[i], &c, sizeof(char), 0);
+					User user = manager.GetUserFromSock(reads.fd_array[i]);
 	
 					if (strLen == 0)    // close request!
 					{
@@ -141,29 +145,33 @@ int main()
 					}
 					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
-						//먼저 buf를 string으로 바꿔줘야 함 그 다음 split할것
-						
-						string strBuf = charVecToStr(buf);
+						string strBuf = charVecToStr(buf);//먼저 buf를 string으로 바꿔줘야 함 그 다음 split할것
 						vector<string> message = split(strBuf, ' ');
 						cout << "message 는 " << message[0] << endl;
 
-						if (message.size()>1 && message[0] == "LOGIN" && message[1].length()>0)
+						if (user.GetState() == State::Waiting) // LOGIN 이전의 상태. 로그인해야함
 						{
-							//@@여기서 유저의 ID를 저장해야하는데 소켓번호밖에 모름. 소켓번호로 유저를 찾아야 함
-							//user.SetID(message[1])
-							string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)";
-							send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
-						}
-						else //로그인 실패
-						{
-							if (message.size() > 1) {
-								cout << "message.size()=" << message.size() << " message[0]=" << message[0] << " message[1] = " << message[1] << endl;
+							if (message.size()>1 && message[0] == "LOGIN" && message[1].length()>0)
+							{
+								//@@여기서 유저의 ID를 저장해야하는데 소켓번호밖에 모름. 소켓번호로 유저를 찾아야 함
+								//user.SetID(message[1])
+								string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)";
+								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+								cout << "User ID : " << message[1] << endl;
+								user.SetID(message[1]);
 							}
-							else
-								cout << "message.size()=" << message.size() << " message[0]=" << message[0]  << endl;
-							string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.";
-							send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
-							buf.clear();//클라가 로그인을 잘못 쳤기 때문에 필요없는 정보 버림
+							else //로그인 실패
+							{
+								if (message.size() > 1) {
+									cout << "message.size()=" << message.size() << " message[0]=" << message[0] << " message[1] = " << message[1] << endl;
+								}
+								else
+									cout << "message.size()=" << message.size() << " message[0]=" << message[0]  << endl;
+								string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.";
+								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+								buf.clear();//클라가 로그인을 잘못 쳤기 때문에 필요없는 정보 버림
+							}
+
 						}
 
 					}
