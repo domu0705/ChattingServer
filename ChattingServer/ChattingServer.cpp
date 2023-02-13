@@ -17,7 +17,7 @@ int main()
 	SOCKET servSock, clntSock;
 	SOCKADDR_IN servAddr, clntAddr;//68p
 
-	int portNum = 2222;
+	u_short portNum = 2222; // win header에서 unsigned short 를 define한 것이 u_short 
 
 
 	string message = "Hello World!";
@@ -55,16 +55,18 @@ int main()
 
 	int adrSz;
 	int strLen, result;
-	char buf[BUF_SIZE];
+	int curStrIndex = 0; // 현재 buf에 데이터가 어디까지 쌓여있는지 알려줌. 차있는 데이터의 다음 칸 index를 가리킴
 
 	FD_ZERO(&reads);//인자로 전달된 주소의 fd_set형 변수의 모든 비트를 0으로 초기화 함
 	FD_SET(servSock, &reads); //&reads주소의 변수에 1번 인자로 전달된 파일 디스크립터 정보를 등록함
+
+	char buf[BUF_SIZE];// 클라이언트의 문자열을 받아 저장할 배열생성 (while문 안에서 생성하면 클라가 입력한 값들이 다 timeout돌면서 초기화돼서 사라짐)
 
 	while (1)
 	{
 		cpyReads = reads;//select함수 호출이 끝나면 변화가 생긴 파일디스크립터 위치를 제외한 나머지는 다 0으로 초기화 돼서 원본 유지를 위해 복사해줌.
 		timeout.tv_sec = 5;//select 에서 무한정 블로킹 상태를 막기 위한 타임아웃(sec)
-		timeout.tv_usec = 5000;//select 에서 무한정 블로킹 상태를 막기 위한 타임아웃(micro sec)
+		timeout.tv_usec = 0;//select 에서 무한정 블로킹 상태를 막기 위한 타임아웃(micro sec)
 
 		if ((result = select(0, &cpyReads, 0, 0, &timeout)) == SOCKET_ERROR)
 		{
@@ -78,7 +80,7 @@ int main()
 			continue;
 		}
 
-		for (int i = 0; i < reads.fd_count; i++)//select가 1 이상 반환됐을 때 실행됨
+		for (int i = 0; i < int(reads.fd_count); i++)//select가 1 이상 반환됐을 때 실행됨
 		{
 			if (FD_ISSET(reads.fd_array[i], &cpyReads)) // FD_ISSET로 상태변화가 있었던(수신된 데이터가 있는 소켓의)파일 디스크립터를 찾음
 			{
@@ -93,7 +95,9 @@ int main()
 				}
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
 				{		//단 이경우에도 수신한 데이터가 문자열 데이터인지 or 연결종료를 의미하는 EOF인지 확인해야 함
-					strLen = recv(reads.fd_array[i], buf, BUF_SIZE - 1, 0);
+					strLen = recv(reads.fd_array[i], buf+ curStrIndex, BUF_SIZE - 1, 0);
+					curStrIndex += strLen;
+					cout << "buf 내용:" << buf << endl;
 					if (strLen == 0)    // close request!
 					{
 						FD_CLR(reads.fd_array[i], &reads);
@@ -101,10 +105,12 @@ int main()
 						cout << "closed client:" << cpyReads.fd_array[i] << endl;
 						//printf("closed client: %d \n", cpyReads.fd_array[i]);
 					}
-					else //수신할 데이터가 문자열인 경우
+					//else if(buf) // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
+					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
 					{
-						const char c[] = "문자열 받음";
-						send(reads.fd_array[i], c, strlen(c), 0);    // echo!
+						//지금은 여기서 문자 하나 받자마자 바로 답함 이걸 고쳐야 함
+						const char c[] = "LOG IN [사용자 이름] 으로 로그인 해주세요\n";
+						send(reads.fd_array[i], c, int(strlen(c)), 0);    // echo!
 					}
 				}
 			}
