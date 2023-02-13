@@ -105,12 +105,16 @@ int main()
 						cout << "closed client:" << cpyReads.fd_array[i] << endl;
 						//printf("closed client: %d \n", cpyReads.fd_array[i]);
 					}
-					//else if(buf) // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
+					else if (buf[curStrIndex - 1] == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
+					{
+						const char c[] = "LOG IN [사용자 이름] 으로 로그인 해주세요\n";
+						send(reads.fd_array[i], c, int(strlen(c)), 0);    // echo!
+					}
 					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
 					{
 						//지금은 여기서 문자 하나 받자마자 바로 답함 이걸 고쳐야 함
-						const char c[] = "LOG IN [사용자 이름] 으로 로그인 해주세요\n";
-						send(reads.fd_array[i], c, int(strlen(c)), 0);    // echo!
+						//const char c[] = "LOG IN [사용자 이름] 으로 로그인 해주세요\n";
+						//send(reads.fd_array[i], c, int(strlen(c)), 0);    // echo!
 					}
 				}
 			}
