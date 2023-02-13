@@ -1,4 +1,9 @@
-﻿#pragma comment(lib, "Ws2_32.lib")
+﻿// -----------------------------------------------------------------------------------
+//  서버와 클라이언트의 연결 및 입출력을 관리
+// -----------------------------------------------------------------------------------
+#include "USER.h"
+
+#pragma comment(lib, "Ws2_32.lib")
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -112,16 +117,15 @@ int main()
 			{
 				cout << "상태변화 있음" << endl;
 
-				if (reads.fd_array[i] == servSock)     // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request)
+				if (reads.fd_array[i] == servSock) // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request)
 				{
 					adrSz = sizeof(clntAddr);
 					clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
+					USER user(clntSock);//유저와 소켓 연결 정보 저장
 					FD_SET(clntSock, &reads);//reads는 FD_set 배열임. 이 배열의 clntSock 인덱스가0 에서 1 로 바뀔듯
 
 					cout << "client  연결 성공. clntSock: " << clntSock << endl;
 					string msg = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 ! "; //\r 은 현재 줄의 맨 앞으로 커서를 옮겨줌. 다음 줄의 맨 앞부터 쓰고 싶다면 \n하고 \r하는 것 추천
-
-					cout << "int(msg.size()) = " << int(msg.size()) << endl;
 					send(clntSock, msg.c_str(), int(msg.size()), 0);    // c_str 는 string을 char * 로 변환
 				}
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
@@ -145,7 +149,8 @@ int main()
 
 						if (message.size()>1 && message[0] == "LOGIN" && message[1].length()>0)
 						{
-							
+							//@@여기서 유저의 ID를 저장해야하는데 소켓번호밖에 모름. 소켓번호로 유저를 찾아야 함
+							//user.SetID(message[1])
 							string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)";
 							send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
 						}
