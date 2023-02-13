@@ -20,7 +20,8 @@ void Manager::SetUserToUserSockAry(SOCKET sockNum, User user)
 
 void Manager::LogIn(SOCKET sockNum, string id)//명령어 안내
 {
-	string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
+	string msg = "\r\n----------------------------------------------\n\r 반갑습니다. \
+					텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
 	send(sockNum, msg.c_str(), int(msg.size()), 0);
 	cout << "User ID : " << id << endl;
 	userAry[sockNum].SetID(id);
@@ -36,6 +37,13 @@ void Manager::H(SOCKET sockNum)//명령어 안내
 
 void Manager::US(SOCKET sockNum)//이용자 목록 보기
 {
+	for (auto iter = nameAry.begin(); iter != nameAry.end(); iter++)
+	{
+		string msg = "------------------------- 이용자 목록 -------------------------\n\r";
+		string userID = iter->first;
+		cout << userID << "\n";
+		send(sockNum, userID.c_str(), int(userID.size()), 0);
+	}
 	cout << "sockNum ID : " << sockNum << endl;
 }
 
