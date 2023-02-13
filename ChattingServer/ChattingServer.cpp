@@ -4,12 +4,38 @@
 #include <ws2tcpip.h>
 
 #include <iostream>
+#include <vector>
 #include <string>
-
+#include <sstream>
 
 #define BUF_SIZE 30
 
 using namespace std;
+
+string charVecToStr(vector<char> &c) 
+{
+	string str = "";
+	for (int i = 0;i < c.size();i++)
+	{
+		cout << "c[" << i << "]" << "= " << c[i] << endl;
+		str += c[i];
+	}
+	return str;
+}
+
+vector<string> split(string str, char Delimiter) {
+	istringstream ss(str);             // istringstream에 str을 담기
+	string buffer;                      // 구분자를 기준으로 절삭된 문자열이 담겨지는 버퍼
+
+	vector<string> result;
+
+	// istringstream은 istream을 상속받으므로 getline을 사용할 수 있음
+	while (getline(ss, buffer, Delimiter)) {
+		result.push_back(buffer);               // 절삭된 문자열을 vector에 저장
+	}
+
+	return result;
+}
 
 int main()
 {
@@ -18,9 +44,6 @@ int main()
 	SOCKADDR_IN servAddr, clntAddr;//68p
 
 	u_short portNum = 2222; // win header에서 unsigned short 를 define한 것이 u_short 
-
-
-	string message = "Hello World!";
 
 
 	//MAKEWORD(2, 2):사용할 소켓의 버전이 2.2 (즉, 주버전 2,부버전2) 로 0x0202를 전달해야함. makeword는 2,2를 바이트 단위로 쪼개서 0x0202를 반환해줌
@@ -55,12 +78,14 @@ int main()
 
 	int adrSz;
 	int strLen, result;
-	int curStrIndex = 0; // 현재 buf에 데이터가 어디까지 쌓여있는지 알려줌. 차있는 데이터의 다음 칸 index를 가리킴
 
 	FD_ZERO(&reads);//인자로 전달된 주소의 fd_set형 변수의 모든 비트를 0으로 초기화 함
 	FD_SET(servSock, &reads); //&reads주소의 변수에 1번 인자로 전달된 파일 디스크립터 정보를 등록함
 
-	char buf[BUF_SIZE];// 클라이언트의 문자열을 받아 저장할 배열생성 (while문 안에서 생성하면 클라가 입력한 값들이 다 timeout돌면서 초기화돼서 사라짐)
+	//char buf[BUF_SIZE];// 클라이언트의 문자열을 받아 저장할 배열생성 (while문 안에서 생성하면 클라가 입력한 값들이 다 timeout돌면서 초기화돼서 사라짐)
+
+	vector<char> buf;
+	char c;
 
 	while (1)
 	{
@@ -80,6 +105,7 @@ int main()
 			continue;
 		}
 
+
 		for (int i = 0; i < int(reads.fd_count); i++)//select가 1 이상 반환됐을 때 실행됨
 		{
 			if (FD_ISSET(reads.fd_array[i], &cpyReads)) // FD_ISSET로 상태변화가 있었던(수신된 데이터가 있는 소켓의)파일 디스크립터를 찾음
@@ -91,13 +117,17 @@ int main()
 					adrSz = sizeof(clntAddr);
 					clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
 					FD_SET(clntSock, &reads);//reads는 FD_set 배열임. 이 배열의 clntSock 인덱스가0 에서 1 로 바뀔듯
+
 					cout << "client  연결 성공. clntSock: " << clntSock << endl;
+					string msg = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 ! "; //\r 은 현재 줄의 맨 앞으로 커서를 옮겨줌. 다음 줄의 맨 앞부터 쓰고 싶다면 \n하고 \r하는 것 추천
+
+					cout << "int(msg.size()) = " << int(msg.size()) << endl;
+					send(clntSock, msg.c_str(), int(msg.size()), 0);    // c_str 는 string을 char * 로 변환
 				}
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
 				{		//단 이경우에도 수신한 데이터가 문자열 데이터인지 or 연결종료를 의미하는 EOF인지 확인해야 함
-					strLen = recv(reads.fd_array[i], buf+ curStrIndex, BUF_SIZE - 1, 0);
-					curStrIndex += strLen;
-					cout << "buf 내용:" << buf << endl;
+					strLen = recv(reads.fd_array[i], &c, sizeof(char), 0);
+	
 					if (strLen == 0)    // close request!
 					{
 						FD_CLR(reads.fd_array[i], &reads);
@@ -105,16 +135,39 @@ int main()
 						cout << "closed client:" << cpyReads.fd_array[i] << endl;
 						//printf("closed client: %d \n", cpyReads.fd_array[i]);
 					}
-					else if (buf[curStrIndex - 1] == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
+					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
-						const char c[] = "LOG IN [사용자 이름] 으로 로그인 해주세요\n";
-						send(reads.fd_array[i], c, int(strlen(c)), 0);    // echo!
+						//먼저 buf를 string으로 바꿔줘야 함 그 다음 split할것
+						
+						string strBuf = charVecToStr(buf);
+						vector<string> message = split(strBuf, ' ');
+						cout << "message 는 " << message[0] << endl;
+
+						if (message.size()>1 && message[0] == "LOGIN" && message[1].length()>0)
+						{
+							
+							string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)";
+							send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+						}
+						else //로그인 실패
+						{
+							if (message.size() > 1) {
+								cout << "message.size()=" << message.size() << " message[0]=" << message[0] << " message[1] = " << message[1] << endl;
+							}
+							else
+								cout << "message.size()=" << message.size() << " message[0]=" << message[0]  << endl;
+							string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.";
+							send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+							buf.clear();//클라가 로그인을 잘못 쳤기 때문에 필요없는 정보 버림
+						}
+
 					}
 					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
 					{
 						//지금은 여기서 문자 하나 받자마자 바로 답함 이걸 고쳐야 함
 						//const char c[] = "LOG IN [사용자 이름] 으로 로그인 해주세요\n";
 						//send(reads.fd_array[i], c, int(strlen(c)), 0);    // echo!
+						buf.push_back(c);
 					}
 				}
 			}
