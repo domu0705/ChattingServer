@@ -152,11 +152,9 @@ int main()
 								string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.\n\r";
 								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
 							}
-
 						}
 						else if (manager.userAry[reads.fd_array[i]].GetState() == State::LOBBY)
 						{
-							cout << "새 명령은" << word[0] <<"입니다" <<endl;
 							if (word[0].compare("H") == 0)
 							{
 								manager.ShowAllCommand(reads.fd_array[i]);
@@ -203,6 +201,10 @@ int main()
 							if (word[0].compare("DEL") == 0)
 							{
 								manager.DeleteRoom(reads.fd_array[i]);
+							}
+							else if (word[0].compare("Q") == 0)
+							{
+								manager.ExitRoom(reads.fd_array[i]);
 							}
 							else
 							{

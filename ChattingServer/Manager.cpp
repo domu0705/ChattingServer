@@ -31,7 +31,7 @@ void Manager::LogIn(SOCKET sockNum, string id)//명령어 안내
 
 void Manager::ShowAllCommand(SOCKET sockNum)//H: 명령어 안내
 {
-	string msg = "---------------------------------------------------------------\n\rH                         명령어 안내\n\rUS                        이용자 목록 보기\n\rLT                        대화방 목록 보기\n\rST [방번호]               대화방 정보 보기\n\rPF [상대방ID]             이용자 정보 보기\n\rX                         끝내기\n\r---------------------------------------------------------------\n\r";
+	string msg = "---------------------------------------------------------------\n\rH                         명령어 안내\n\rUS                        이용자 목록 보기\n\rLT                        대화방 목록 보기\n\rST [방번호]               대화방 정보 보기\n\rPF [상대방ID]             이용자 정보 보기\n\rDEL                         방 폭파\n\rQ                         방 나가기\n\rX                         끝내기\n\r---------------------------------------------------------------\n\r";
 	send(sockNum, msg.c_str(), int(msg.size()), 0);
 }
 
@@ -158,6 +158,12 @@ void Manager::DeleteRoom(SOCKET sockNum)//확인
 
 }
 
+void Manager::ExitRoom(SOCKET sockNum)
+{
+	User* user = GetUserFromSock(sockNum);
+	roomAry[user->GetRoomNum()].ExitRoom(user);
+}
+
 string Manager::GetCurTime() 
 {
 	string curTime = "";
@@ -181,17 +187,3 @@ void Manager::SendMsgToRoom(User* user, string msg) // room에서 채팅 보내기
 	string msgInfo = format("{} > {}\n\r", user->GetID(), msg);
 	roomAry[user->GetRoomNum()].SendMsgToRoom(msgInfo);
 }
-
-/* tm 구조체 내부
-struct tm {
-   int tm_sec;         // 초,  range 0 to 59
-   int tm_min;         // 분, range 0 to 59
-   int tm_hour;        // 시간, range 0 to 23
-   int tm_mday;        // 일, range 1 to 31
-   int tm_mon;         // 월, range 0 to 11
-   int tm_year;        // 1900년 부터의 년
-   int tm_wday;        // 요일, range 일(0) to 토(6)
-   int tm_yday;        // 1년 중 경과 일, range 0 to 365
-   int tm_isdst;       // 섬머타임 실시 여부 (양수, 0, 음수)
-};
-*/

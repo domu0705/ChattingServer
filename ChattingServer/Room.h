@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <format>
 
 using namespace std;
 
@@ -37,5 +38,6 @@ public:
 	string GetCurRoomInfo();
 	void SendMsgToRoom(string msg);
 	void CloseRoom();
+	void ExitRoom(User* user);
 	bool GetIsOpen();
 };
