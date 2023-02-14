@@ -23,19 +23,21 @@ class User
 {
 private:
 	SOCKET socketNum;
+	string ipAddr;
 	State state;
-	string ID;
+	string id;
 	string roomName;
 	string roomInTime;//방에 참가한 시간
 
 public:
 	User();
-	User(SOCKET socketNum);
+	User(SOCKET socketNum, string ipAddr);
 
 	State GetState();
 	void SetState(State newState);
 	const string GetID();
 	void SetID(string ID);
+	string GetIpAddr();
 	void SetRoom(string roomName);
 	void SetRoomInTime(string roomInTime);
 	string GetRoomInTime();

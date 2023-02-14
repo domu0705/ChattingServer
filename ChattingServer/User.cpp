@@ -4,10 +4,11 @@ User::User()
 {
 	state = WAITING;
 }
-User::User(SOCKET _socketNum)
+User::User(SOCKET _socketNum,string _ipAddr)
 {
-	socketNum = _socketNum;
-	state = WAITING;
+	this->socketNum = _socketNum;
+	this->state = WAITING;
+	this->ipAddr = _ipAddr;
 }
 
 State User::GetState()
@@ -17,30 +18,34 @@ State User::GetState()
 
 void User::SetState(State newState)
 {
-	state = newState;
-	cout << "SetState = " << state << endl;
+	this->state = newState;
+	//cout << "SetState = " << state << endl;
 }
 
 const string User::GetID()
 {
-	return ID;
+	return id;
 }
 
-void User::SetID(string _ID)
+void User::SetID(string _id)
 {
-	ID = _ID;
+	this->id = _id;
 }
 
+string User::GetIpAddr()
+{
+	return ipAddr;
+}
 
 void User::SetRoom(string _roomName)
 {
-	roomName = _roomName;
+	this->roomName = _roomName;
 	SetState(ROOM);
 }
 
 void User::SetRoomInTime(string _roomInTime)
 {
-	roomInTime = _roomInTime;
+	this->roomInTime = _roomInTime;
 }
 
 string User::GetRoomInTime()

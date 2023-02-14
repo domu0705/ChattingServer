@@ -37,13 +37,15 @@ void Manager::ShowAllCommand(SOCKET sockNum)//H: 명령어 안내
 
 void Manager::ShowUserList(SOCKET sockNum)//US : 이용자 목록 보기 ()
 {
+	string header = "------------------------- 이용자 목록 -------------------------\n\r";
+	string userInfo = "";
 	for (auto iter = nameAry.begin(); iter != nameAry.end(); iter++)
 	{
-		string header = "------------------------- 이용자 목록 -------------------------\n\r";
-		string userID = header+"이용자: " + iter->first + "\t접속지: "+ to_string(sockNum);
-		cout << userID << "\n";
-		send(sockNum, userID.c_str(), int(userID.size()), 0);
+		userInfo += "이용자: " + iter->first + "\t접속지: " + iter->second.GetIpAddr() + "\n\r";
+		//cout << userID << "\n";
 	}
+	string msg = format("{}{}", header, userInfo);
+	send(sockNum,  +msg.c_str(), int(msg.size()), 0);
 	cout << "sockNum ID : " << sockNum << endl;
 }
 

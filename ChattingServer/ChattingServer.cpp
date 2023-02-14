@@ -3,6 +3,8 @@
 // -----------------------------------------------------------------------------------
 #include "USER.h"
 #include "Manager.h"
+//#define _CRT_SECURE_NO_WARNINGS
+#pragma warning(disable:4996)
 #pragma comment(lib, "Ws2_32.lib")
 
 #include <winsock2.h>
@@ -12,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <format>
 
 #define BUF_SIZE 30
 
@@ -119,8 +122,10 @@ int main()
 				{
 					adrSz = sizeof(clntAddr);
 					clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
-					cout << "clntAddr@#@@@@@@@@@" << &clntAddr << endl;
-					User user(clntSock);//유저와 소켓 연결 정보 저장
+					
+					//cout << "clntAddr@#@@@@@@@@@" << inet_ntoa(clntAddr.sin_addr)<<" 주소" <<ntohs(clntAddr.sin_port) << endl;
+					string userAddr = format("{}:{}", inet_ntoa(clntAddr.sin_addr), ntohs(clntAddr.sin_port));
+					User user(clntSock, userAddr);//유저와 소켓 연결 정보 저장
 					manager.SetUserToUserSockAry(clntSock, user);
 
 					FD_SET(clntSock, &reads);//reads는 FD_set 배열임. 이 배열의 clntSock 인덱스가0 에서 1 로 바뀔듯
