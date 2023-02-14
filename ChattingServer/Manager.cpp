@@ -44,7 +44,7 @@ void Manager::ShowUserList(SOCKET sockNum)//US : 이용자 목록 보기 ()
 		userInfo += "이용자: " + iter->first + "\t접속지: " + iter->second.GetIpAddr() + "\n\r";
 		//cout << userID << "\n";
 	}
-	string msg = format("{}{}", header, userInfo);
+	string msg = format("{}{}{}", header, userInfo,"\n\r명령어안내(H) 종료(X)\n\r");
 	send(sockNum,  +msg.c_str(), int(msg.size()), 0);
 	cout << "sockNum ID : " << sockNum << endl;
 }
@@ -82,13 +82,38 @@ void Manager::MakeRoom(SOCKET sockNum, int maxClnt, string roomName)//O: 대화방 
 	roomAry[roomIdx].EnterUser(user, GetCurTime());
 
 	//클라 알림보내기
-	string str = "** 대화방이 개설되었습니다.";
-	send(sockNum, str.c_str(), int(str.size()), 0);
+	string str = "** 대화방이 개설되었습니다.\n\r";
+
+	//send(sockNum, str.c_str(), int(str.size()), 0);
+	string msg = format("** {}님이 들어오셨습니다. (현재인원 {}/{})\n\r", user->GetID(), roomAry[roomIdx].GetCurClntNum(), roomAry[roomIdx].GetMaxClntNum());
+	roomAry[roomIdx].SendMsgToRoom(msg);
 }
 
-void Manager::J(SOCKET sockNum)//대화방 참여하기
+void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
 {
-	cout << "sockNum ID : " << sockNum << endl;
+	if (roomNum > roomAry.size() || roomNum < 1)
+	{
+		string msg = "** 해당 방은 존재하지 않습니다. \n\r명령어안내(H) 종료(X)\n\r";
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+		
+	}
+	else //방 번호는 존재
+	{
+		if (roomAry[roomNum - 1].GetMaxClntNum() <= roomAry[roomNum - 1].GetCurClntNum())
+		{
+			string msg = "** 인원이 꽉 차서 참여할 수 없습니다.\n\r명령어안내(H) 종료(X)\n\r";
+			send(sockNum, msg.c_str(), int(msg.size()), 0);
+		}
+		else
+		{
+			User* user = GetUserFromSock(sockNum);
+			roomAry[roomIdx].EnterUser(user, GetCurTime());
+
+			string msg = format("** {}님이 들어오셨습니다. (현재인원 {}/{})\n\r", user->GetID(), roomAry[roomNum - 1].GetCurClntNum(), roomAry[roomNum - 1].GetMaxClntNum());
+			roomAry[roomNum - 1].SendMsgToRoom(msg);
+		}
+	}
+	
 }
 
 void Manager::X(SOCKET sockNum)//끝내기

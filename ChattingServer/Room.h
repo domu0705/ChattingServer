@@ -31,4 +31,5 @@ public:
 	int GetMaxClntNum();
 	vector<User*> GetUserAry();
 	string GetCurRoomInfo();
+	void SendMsgToRoom(string msg);
 };

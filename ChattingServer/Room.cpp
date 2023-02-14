@@ -57,3 +57,12 @@ string Room::GetCurRoomInfo()
 
 	return header + roomInfo + peopleInfo + boundary;
 }
+
+void Room::SendMsgToRoom(string msg)
+{
+	//방안의 모든 클라이언트에게 메세지 보내기
+	for (int i = 0;i < curClntNum; ++i)
+	{
+		send(userAry[i]->GetSocket(), msg.c_str(), int(msg.size()), 0);
+	}
+}

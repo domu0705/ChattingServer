@@ -37,6 +37,7 @@ public:
 	void SetState(State newState);
 	const string GetID();
 	void SetID(string ID);
+	SOCKET GetSocket();
 	string GetIpAddr();
 	void SetRoom(string roomName);
 	void SetRoomInTime(string roomInTime);

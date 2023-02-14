@@ -116,8 +116,6 @@ int main()
 		{
 			if (FD_ISSET(reads.fd_array[i], &cpyReads)) // FD_ISSET로 상태변화가 있었던(수신된 데이터가 있는 소켓의)파일 디스크립터를 찾음
 			{
-				cout << "상태변화 있음" << endl;
-
 				if (reads.fd_array[i] == servSock) // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request)
 				{
 					adrSz = sizeof(clntAddr);
@@ -196,7 +194,7 @@ int main()
 							}
 							else if (message[0].compare("J") == 0)
 							{
-								manager.J(reads.fd_array[i]);
+								manager.JoinRoom(reads.fd_array[i], stoi(message[1]));
 							}
 							else if (message[0].compare("X") == 0)
 							{

@@ -32,6 +32,11 @@ void User::SetID(string _id)
 	this->id = _id;
 }
 
+SOCKET User::GetSocket()
+{
+	return this->socketNum;
+}
+
 string User::GetIpAddr()
 {
 	return ipAddr;

@@ -62,7 +62,7 @@ public:
 	void ShowUserInfo(SOCKET sockNum);
 	void TO(SOCKET sockNum);
 	void MakeRoom(SOCKET sockNum, int maxClnt, string roomName);
-	void J(SOCKET sockNum);
+	void JoinRoom(SOCKET sockNum,int roomNum);
 	void X(SOCKET sockNum);
 	void NotExistingCommend(SOCKET sockNum);
 
