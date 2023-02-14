@@ -15,7 +15,6 @@
 
 #define BUF_SIZE 30
 
-using namespace std;
 
 string charVecToStr(vector<char> &c) //안씀
 {
@@ -130,7 +129,7 @@ int main()
 					send(clntSock, msg.c_str(), int(msg.size()), 0);    // c_str 는 string을 char * 로 변환
 				}
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
-				{		//단 이경우에도 수신한 데이터가 문자열 데이터인지 or 연결종료를 의미하는 EOF인지 확인해야 함
+				{		
 					strLen = recv(reads.fd_array[i], &c, sizeof(char), 0);
 
 					if (strLen == 0)    // close request!
@@ -141,32 +140,18 @@ int main()
 					}
 					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
-
 						string strBuf = buf.substr(0, buf.length() - 1);// 뒤에 자동으로 오는 \r을 제거
 						vector<string> message = split(strBuf, ' ');
 						cout << "strBuf 는" << strBuf << "입니다."<<endl;
 
-						//cout << "user.GetState() = " << manager.userAry[reads.fd_array[i]].GetState() << endl;
 						if (manager.userAry[reads.fd_array[i]].GetState() == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
 						{
 							if (message.size() > 1 && message[0] == "LOGIN" && message[1].length() > 0)
 							{
-								//@@여기서 유저의 ID를 저장해야하는데 소켓번호밖에 모름. 소켓번호로 유저를 찾아야 함
-								//user.SetID(message[1])
-								/*string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
-								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
-								cout << "User ID : " << message[1] << endl;
-								manager.userAry[reads.fd_array[i]].SetID(message[1]);
-								manager.userAry[reads.fd_array[i]].SetState(State::LOBBY);*/
 								manager.LogIn(reads.fd_array[i], message[1]);
 							}
 							else //로그인 실패
 							{
-								if (message.size() > 1) {
-									cout << "message.size()=" << message.size() << " message[0]=" << message[0] << " message[1] = " << message[1] << endl;
-								}
-								else
-									cout << "message.size()=" << message.size() << " message[0]=" << message[0] << endl;
 								string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.";
 								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
 							}
@@ -175,33 +160,33 @@ int main()
 						else if (manager.userAry[reads.fd_array[i]].GetState() == State::LOBBY)
 						{
 							cout << "새 명령은" << message[0] <<"입니다" <<endl;
-							if (message[0].length() == 1 && message[0] == string("H"))
+							if (message[0] == string("H"))
 							{
-								manager.H(reads.fd_array[i]);
+								manager.ShowAllCommand(reads.fd_array[i]);
 							}
 							else if (message[0].compare("US") == 0) // compare() : 같으면 0 , 다르면 -1 리턴
 							{
-								manager.US(reads.fd_array[i]);
+								manager.ShowUserList(reads.fd_array[i]);
 							}
 							else if (message[0].compare("LT") == 0)
 							{
-								manager.LT(reads.fd_array[i]);
+								manager.ShowRoomList(reads.fd_array[i]);
 							}
 							else if (message[0].compare("ST") == 0)
 							{
-								manager.ST(reads.fd_array[i]);
+								manager.ShowRoomInfo(reads.fd_array[i]);
 							}
 							else if (message[0].compare("PF") == 0)
 							{
-								manager.PF(reads.fd_array[i]);
+								manager.ShowUserInfo(reads.fd_array[i]);
 							}
 							else if (message[0].compare("TO") == 0)
 							{
 								manager.TO(reads.fd_array[i]);
 							}
-							else if (message[0].compare("O") == 0)
+							else if (message[0].compare("O") == 0) // 대화방 만들기
 							{
-								manager.O(reads.fd_array[i]);
+								manager.MakeRoom(reads.fd_array[i], stoi(message[1]), message[2]);
 							}
 							else if (message[0].compare("J") == 0)
 							{
@@ -216,6 +201,10 @@ int main()
 								manager.NotExistingCommend(reads.fd_array[i]);
 							}
 						}
+						else if (manager.userAry[reads.fd_array[i]].GetState() == State::ROOM)
+						{
+							cout << "클라이언트는 State::ROOM 로 들어왔어요"<< endl;
+						}
 						else{}
 						buf.clear();
 
@@ -224,8 +213,6 @@ int main()
 					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
 					{
 						//지금은 여기서 문자 하나 받자마자 바로 답함 이걸 고쳐야 함
-						//const char c[] = "LOG IN [사용자 이름] 으로 로그인 해주세요\n";
-						//send(reads.fd_array[i], c, int(strlen(c)), 0);    // echo!
 						buf+=c;
 					}
 				}

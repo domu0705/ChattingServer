@@ -1,7 +1,6 @@
 // -----------------------------------------------------------------------------------
-//  사용자의 상태 관리
+//  클라이언트 정보
 // -----------------------------------------------------------------------------------
-
 #pragma once
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -26,6 +25,7 @@ private:
 	SOCKET socketNum;
 	State state;
 	string ID;
+	string roomName;
 
 public:
 	User();
@@ -33,7 +33,8 @@ public:
 
 	State GetState();
 	void SetState(State newState);
-	string GetID();
+	const string GetID();
 	void SetID(string ID);
+	void SetRoom(string roomName);
 
 };

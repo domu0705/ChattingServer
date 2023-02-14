@@ -1,6 +1,5 @@
 #include "USER.h"
 
-
 User::User()
 {
 	state = WAITING;
@@ -22,15 +21,20 @@ void User::SetState(State newState)
 	cout << "SetState = " << state << endl;
 }
 
-string User::GetID()
+const string User::GetID()
 {
 	return ID;
 }
 
-void User::SetID(string id)
+void User::SetID(string _ID)
 {
-	ID = id;
-	return;
+	ID = _ID;
 }
 
+
+void User::SetRoom(string _roomName)
+{
+	roomName = _roomName;
+	SetState(ROOM);
+}
 
