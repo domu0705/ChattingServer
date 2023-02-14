@@ -11,18 +11,24 @@ using namespace std;
 
 class Room
 {
+	int roomIdx;
 	string name;
 	string owner;
 	bool isOpen;
-	string genTime;
-	int maxClnt;
+	string genTime;//Ω√:∫–:√ 
+	int curClntNum;
+	int maxClntNum;
 
 private:
-	vector<User> userAry;
+	vector<User*> userAry;
 
 public:
 	Room();
 
-	void SetRoom(User* user, string name, string owner, string genTime, int maxClnt);
-	void SetUser(User* user);
+	void SetRoom(int roomIdx, string name, string owner, string genTime, int maxClnt);
+	void EnterUser(User* user,string enterTime);
+	int GetCurClntNum();
+	int GetMaxClntNum();
+	vector<User*> GetUserAry();
+	string GetCurRoomInfo();
 };

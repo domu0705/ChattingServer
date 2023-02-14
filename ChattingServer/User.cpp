@@ -38,3 +38,12 @@ void User::SetRoom(string _roomName)
 	SetState(ROOM);
 }
 
+void User::SetRoomInTime(string _roomInTime)
+{
+	roomInTime = _roomInTime;
+}
+
+string User::GetRoomInTime()
+{
+	return roomInTime;
+}

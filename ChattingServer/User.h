@@ -26,6 +26,7 @@ private:
 	State state;
 	string ID;
 	string roomName;
+	string roomInTime;//방에 참가한 시간
 
 public:
 	User();
@@ -36,5 +37,6 @@ public:
 	const string GetID();
 	void SetID(string ID);
 	void SetRoom(string roomName);
-
+	void SetRoomInTime(string roomInTime);
+	string GetRoomInTime();
 };

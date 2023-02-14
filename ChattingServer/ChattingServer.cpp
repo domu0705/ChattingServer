@@ -43,7 +43,7 @@ vector<string> split(string str, char Delimiter) {
 
 int main()
 {
-	Manager manager;
+	Manager& manager = Manager::GetInstance();
 	WSADATA	wsaData;//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
 	SOCKET servSock, clntSock;
 	SOCKADDR_IN servAddr, clntAddr;//68p
@@ -119,6 +119,7 @@ int main()
 				{
 					adrSz = sizeof(clntAddr);
 					clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
+					cout << "clntAddr@#@@@@@@@@@" << &clntAddr << endl;
 					User user(clntSock);//유저와 소켓 연결 정보 저장
 					manager.SetUserToUserSockAry(clntSock, user);
 
@@ -174,7 +175,7 @@ int main()
 							}
 							else if (message[0].compare("ST") == 0)
 							{
-								manager.ShowRoomInfo(reads.fd_array[i]);
+								manager.ShowRoomInfo(reads.fd_array[i], stoi(message[1]));
 							}
 							else if (message[0].compare("PF") == 0)
 							{

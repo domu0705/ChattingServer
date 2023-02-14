@@ -3,6 +3,8 @@
 // -----------------------------------------------------------------------------------
 #pragma once
 #pragma comment(lib, "Ws2_32.lib")
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "Data.h"
 #include "Room.h"
 #include "User.h"
@@ -13,7 +15,7 @@
 #include <string>
 #include <vector>
 #include <map>
-
+#include <ctime> 
 
 /*
 enum Command
@@ -33,14 +35,21 @@ enum Command
 class Manager
 {
 private:
+	static Manager* instance;
 	Data Data;
-
+	int roomIdx;
+	//Manager& operator=(const Manager& ref) {}
+	//~Manager() {}
 public:
 	map<SOCKET, User> userAry;//socket과 client 묶을 자료형
 	map<string, User> nameAry;
 	vector<Room> roomAry;
 
 	Manager();
+	static Manager& GetInstance() {
+		static Manager s;
+		return s;
+	}
 	User* GetUserFromSock(SOCKET sockNum);
 	void SetUserToUserSockAry(SOCKET sockNum,User user);
 
@@ -48,11 +57,13 @@ public:
 	void ShowAllCommand(SOCKET sockNum);
 	void ShowUserList(SOCKET sockNum);
 	void ShowRoomList(SOCKET sockNum);
-	void ShowRoomInfo(SOCKET sockNum);
+	void ShowRoomInfo(SOCKET sockNum, int roomIdx);
 	void ShowUserInfo(SOCKET sockNum);
 	void TO(SOCKET sockNum);
 	void MakeRoom(SOCKET sockNum, int maxClnt, string roomName);
 	void J(SOCKET sockNum);
 	void X(SOCKET sockNum);
 	void NotExistingCommend(SOCKET sockNum);
+
+	string GetCurTime();
 };
