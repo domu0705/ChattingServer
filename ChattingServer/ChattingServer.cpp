@@ -200,12 +200,17 @@ int main()
 						}
 						else if (manager.userAry[reads.fd_array[i]].GetState() == State::ROOM)
 						{
-							manager.SendMsgToRoom(manager.GetUserFromSock(reads.fd_array[i]), msgBuf);
+							if (word[0].compare("DEL") == 0)
+							{
+								manager.DeleteRoom(reads.fd_array[i]);
+							}
+							else
+							{
+								manager.SendMsgToRoom(manager.GetUserFromSock(reads.fd_array[i]), msgBuf);
+							}
 						}
 						else{}
 						buf.clear();
-
-
 					}
 					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
 					{

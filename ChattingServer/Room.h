@@ -5,31 +5,37 @@
 
 #include "User.h"
 #include <vector>
+#include <set>
 #include <string>
 
 using namespace std;
 
 class Room
 {
+
+private:
 	int roomIdx;
+	bool isOpen;
 	string name;
 	string owner;
-	bool isOpen;
 	string genTime;//Ω√:∫–:√ 
 	int curClntNum;
 	int maxClntNum;
-
-private:
-	vector<User*> userAry;
+	set<User*> userAry;
 
 public:
 	Room();
 
 	void SetRoom(int roomIdx, string name, string owner, string genTime, int maxClnt);
 	void EnterUser(User* user,string enterTime);
+	void ExitUser(User* user);
+	int GetRoomIdx();
 	int GetCurClntNum();
 	int GetMaxClntNum();
-	vector<User*> GetUserAry();
+	void SetMaxClntNum(int maxClntNum);
+	set<User*> GetUserAry();
 	string GetCurRoomInfo();
 	void SendMsgToRoom(string msg);
+	void CloseRoom();
+	bool GetIsOpen();
 };

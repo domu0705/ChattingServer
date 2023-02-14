@@ -22,7 +22,7 @@ void User::SetState(State newState)
 	//cout << "SetState = " << state << endl;
 }
 
-const string User::GetID()
+string User::GetID()
 {
 	return id;
 }

@@ -66,6 +66,7 @@ public:
 	void X(SOCKET sockNum);
 	void NotExistingCommend(SOCKET sockNum);
 
+	void DeleteRoom(SOCKET sockNum);
 	string GetCurTime();
 	void SendMsgToRoom(User* user,string msg);
 };

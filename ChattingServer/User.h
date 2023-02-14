@@ -36,7 +36,7 @@ public:
 
 	State GetState();
 	void SetState(State newState);
-	const string GetID();
+	string GetID();
 	void SetID(string ID);
 	SOCKET GetSocket();
 	string GetIpAddr();

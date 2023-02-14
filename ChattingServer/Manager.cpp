@@ -56,8 +56,16 @@ void Manager::ShowRoomList(SOCKET sockNum)//LT : 대화방 목록 보기
 
 void Manager::ShowRoomInfo(SOCKET sockNum,int _roomIdx)//ST :L 대화방 정보 보기
 {
-	string msg = roomAry[_roomIdx-1].GetCurRoomInfo();
-	send(sockNum, msg.c_str(), int(msg.size()), 0);
+	if (_roomIdx > roomAry.size()|| _roomIdx <1 || !roomAry[_roomIdx - 1].GetIsOpen())//방이 없거나 이미 닫혀있다면
+	{
+		string msg = "** 해당 번호의 방은 존재하지 않습니다.\n\r";
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+	}
+	else
+	{
+		string msg = roomAry[_roomIdx-1].GetCurRoomInfo();
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+	}
 }
 
 void Manager::ShowUserInfo(SOCKET sockNum)//PF: 이용자 정보 보기
@@ -84,7 +92,7 @@ void Manager::MakeRoom(SOCKET sockNum, int maxClnt, string roomName)//O: 대화방 
 	//클라 알림보내기
 	string str = "** 대화방이 개설되었습니다.\n\r";
 
-	//send(sockNum, str.c_str(), int(str.size()), 0);
+	send(sockNum, str.c_str(), int(str.size()), 0);
 	string msg = format("** {}님이 들어오셨습니다. (현재인원 {}/{})\n\r", user->GetID(), roomAry[roomIdx].GetCurClntNum(), roomAry[roomIdx].GetMaxClntNum());
 	roomAry[roomIdx].SendMsgToRoom(msg);
 	++roomIdx;
@@ -126,6 +134,28 @@ void Manager::NotExistingCommend(SOCKET sockNum)//끝내기
 {
 	string msg = "\n\r존재하지 않는 명령입니다. \n\r명령어안내(H) 종료(X)\n\r";
 	send(sockNum, msg.c_str(), int(msg.size()), 0);
+}
+
+void Manager::DeleteRoom(SOCKET sockNum)//확인
+{
+	User* user = GetUserFromSock(sockNum);
+	int curRoomNum = user->GetRoomNum();
+	//int curClntNum = roomAry[curRoomNum]->GetCurClntNum();
+	set<User*> roomUserAry = roomAry[curRoomNum].GetUserAry();
+
+	roomAry[curRoomNum].SetMaxClntNum(0);//방 폭파
+	roomAry[curRoomNum].CloseRoom();
+	//curClent 도 0돼야 함 수정 userAr
+
+	string msg = "\n\r해당 방은 폭파되었습니다. 로비로 이동합니다.\n\r명령어안내(H) 종료(X)\n\r";
+
+	//방 안의 사람들 내보내기
+	for (auto iter = roomUserAry.begin();iter != roomUserAry.end();iter++)
+	{
+		(*iter)->SetState(LOBBY);
+		send((*iter)->GetSocket(), msg.c_str(), int(msg.size()), 0);
+	}
+
 }
 
 string Manager::GetCurTime() 
