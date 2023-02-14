@@ -40,4 +40,5 @@ public:
 	void CloseRoom();
 	void ExitRoom(User* user);
 	bool GetIsOpen();
+	string GetRoomName();
 };

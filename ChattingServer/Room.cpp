@@ -107,3 +107,8 @@ bool Room::GetIsOpen()
 {
 	return isOpen;
 }
+
+string Room::GetRoomName()
+{
+	return name;
+}

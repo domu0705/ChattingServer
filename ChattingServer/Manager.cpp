@@ -51,7 +51,19 @@ void Manager::ShowUserList(SOCKET sockNum)//US : 이용자 목록 보기 ()
 
 void Manager::ShowRoomList(SOCKET sockNum)//LT : 대화방 목록 보기
 {
-	cout << "sockNum ID : " << sockNum << endl;
+	string header = "------------------------- 대화방 목록 -------------------------\n\r";
+	string roomInfo = "";
+	for (int i = 0;i< roomAry.size();i++)
+	{
+		if (roomAry[i].GetIsOpen())
+		{
+			roomInfo += "[" + to_string(roomAry[i].GetRoomIdx()+1) + "] (" + to_string(roomAry[i].GetCurClntNum()) + "/" + to_string(roomAry[i].GetMaxClntNum()) + ") " + roomAry[i].GetRoomName()+"\n\r";
+		}
+	}
+	string  boundary = "----------------------------------------------------------------\n\r명령어안내(H) 종료(X)\n\r선택>";
+
+	string msg = header + roomInfo + boundary;
+	send(sockNum, +msg.c_str(), int(msg.size()), 0);
 }
 
 void Manager::ShowRoomInfo(SOCKET sockNum,int _roomIdx)//ST :L 대화방 정보 보기

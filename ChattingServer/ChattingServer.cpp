@@ -163,7 +163,7 @@ int main()
 							{
 								manager.ShowUserList(reads.fd_array[i]);
 							}
-							else if (word[0].compare("LT") == 0)
+							else if (word[0].compare("LT") == 0)//대화방 목록 보기
 							{
 								manager.ShowRoomList(reads.fd_array[i]);
 							}
