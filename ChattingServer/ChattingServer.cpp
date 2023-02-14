@@ -79,7 +79,6 @@ int main()
 		cout << "listen() success" << endl;
 
 
-
 	//SELECT 사용환경 설정
 	TIMEVAL timeout;
 	fd_set reads, cpyReads;//파일 디스크립터 배열(0,1로 표현되는 bit단위)
@@ -95,42 +94,37 @@ int main()
 
 	while (1)
 	{
-		cpyReads = reads;//select함수 호출이 끝나면 변화가 생긴 파일디스크립터 위치를 제외한 나머지는 다 0으로 초기화 돼서 원본 유지를 위해 복사해줌.
-		timeout.tv_sec = 5;//select 에서 무한정 블로킹 상태를 막기 위한 타임아웃(sec)
-		timeout.tv_usec = 0;//select 에서 무한정 블로킹 상태를 막기 위한 타임아웃(micro sec)
+		cpyReads = reads;
+		timeout.tv_sec = 5;
+		timeout.tv_usec = 0;
 
 		if ((result = select(0, &cpyReads, 0, 0, &timeout)) == SOCKET_ERROR)
 		{
-			cout << "SOCKET error" << endl;
 			break;
 		}
 
 		if (result == 0) 
 		{
-			cout << "no change in fd set" << endl;
 			continue;
 		}
-
 
 		for (int i = 0; i < int(reads.fd_count); i++)//select가 1 이상 반환됐을 때 실행됨
 		{
 			if (FD_ISSET(reads.fd_array[i], &cpyReads)) // FD_ISSET로 상태변화가 있었던(수신된 데이터가 있는 소켓의)파일 디스크립터를 찾음
 			{
-				if (reads.fd_array[i] == servSock) // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request)
+				if (reads.fd_array[i] == servSock) // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request) 클라와 연결
 				{
 					adrSz = sizeof(clntAddr);
 					clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
 					
-					//cout << "clntAddr@#@@@@@@@@@" << inet_ntoa(clntAddr.sin_addr)<<" 주소" <<ntohs(clntAddr.sin_port) << endl;
 					string userAddr = format("{}:{}", inet_ntoa(clntAddr.sin_addr), ntohs(clntAddr.sin_port));
 					User user(clntSock, userAddr);//유저와 소켓 연결 정보 저장
 					manager.SetUserToUserSockAry(clntSock, user);
 
-					FD_SET(clntSock, &reads);//reads는 FD_set 배열임. 이 배열의 clntSock 인덱스가0 에서 1 로 바뀔듯
+					FD_SET(clntSock, &reads);
 
-					cout << "client  연결 성공. clntSock: " << clntSock << endl;
-					string msg = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 !\n\r "; //\r 은 현재 줄의 맨 앞으로 커서를 옮겨줌. 다음 줄의 맨 앞부터 쓰고 싶다면 \n하고 \r하는 것 추천
-					send(clntSock, msg.c_str(), int(msg.size()), 0);    // c_str 는 string을 char * 로 변환
+					string msg = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 !\n\r ";
+					send(clntSock, msg.c_str(), int(msg.size()), 0);   // c_str 는 string을 char * 로 변환
 				}
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
 				{		
@@ -144,59 +138,58 @@ int main()
 					}
 					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
-						string strBuf = buf.substr(0, buf.length() - 1);// 뒤에 자동으로 오는 \r을 제거
-						vector<string> message = split(strBuf, ' ');
-						cout << "strBuf 는" << strBuf << "입니다."<<endl;
+						string msgBuf = buf.substr(0, buf.length() - 1);// 뒤에 자동으로 오는 \r을 제거
+						vector<string> word = split(msgBuf, ' ');
 
 						if (manager.userAry[reads.fd_array[i]].GetState() == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
 						{
-							if (message.size() > 1 && message[0] == "LOGIN" && message[1].length() > 0)
+							if (word.size() > 1 && word[0] == "LOGIN" && word[1].length() > 0)
 							{
-								manager.LogIn(reads.fd_array[i], message[1]);
+								manager.LogIn(reads.fd_array[i], word[1]);
 							}
 							else //로그인 실패
 							{
-								string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.";
+								string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.\n\r";
 								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
 							}
 
 						}
 						else if (manager.userAry[reads.fd_array[i]].GetState() == State::LOBBY)
 						{
-							cout << "새 명령은" << message[0] <<"입니다" <<endl;
-							if (message[0] == string("H"))
+							cout << "새 명령은" << word[0] <<"입니다" <<endl;
+							if (word[0].compare("H") == 0)
 							{
 								manager.ShowAllCommand(reads.fd_array[i]);
 							}
-							else if (message[0].compare("US") == 0) // compare() : 같으면 0 , 다르면 -1 리턴
+							else if (word[0].compare("US") == 0) // compare() : 같으면 0 , 다르면 -1 리턴
 							{
 								manager.ShowUserList(reads.fd_array[i]);
 							}
-							else if (message[0].compare("LT") == 0)
+							else if (word[0].compare("LT") == 0)
 							{
 								manager.ShowRoomList(reads.fd_array[i]);
 							}
-							else if (message[0].compare("ST") == 0)
+							else if (word[0].compare("ST") == 0)
 							{
-								manager.ShowRoomInfo(reads.fd_array[i], stoi(message[1]));
+								manager.ShowRoomInfo(reads.fd_array[i], stoi(word[1]));
 							}
-							else if (message[0].compare("PF") == 0)
+							else if (word[0].compare("PF") == 0)
 							{
 								manager.ShowUserInfo(reads.fd_array[i]);
 							}
-							else if (message[0].compare("TO") == 0)
+							else if (word[0].compare("TO") == 0)
 							{
 								manager.TO(reads.fd_array[i]);
 							}
-							else if (message[0].compare("O") == 0) // 대화방 만들기
+							else if (word[0].compare("O") == 0) // 대화방 만들기
 							{
-								manager.MakeRoom(reads.fd_array[i], stoi(message[1]), message[2]);
+								manager.MakeRoom(reads.fd_array[i], stoi(word[1]), word[2]);
 							}
-							else if (message[0].compare("J") == 0)
+							else if (word[0].compare("J") == 0)
 							{
-								manager.JoinRoom(reads.fd_array[i], stoi(message[1]));
+								manager.JoinRoom(reads.fd_array[i], stoi(word[1]));
 							}
-							else if (message[0].compare("X") == 0)
+							else if (word[0].compare("X") == 0)
 							{
 								manager.X(reads.fd_array[i]);
 							}
@@ -207,7 +200,7 @@ int main()
 						}
 						else if (manager.userAry[reads.fd_array[i]].GetState() == State::ROOM)
 						{
-							cout << "클라이언트는 State::ROOM 로 들어왔어요"<< endl;
+							manager.SendMsgToRoom(manager.GetUserFromSock(reads.fd_array[i]), msgBuf);
 						}
 						else{}
 						buf.clear();

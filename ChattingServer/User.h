@@ -27,6 +27,7 @@ private:
 	State state;
 	string id;
 	string roomName;
+	int roomNum;
 	string roomInTime;//방에 참가한 시간
 
 public:
@@ -40,6 +41,8 @@ public:
 	SOCKET GetSocket();
 	string GetIpAddr();
 	void SetRoom(string roomName);
+	void SetRoomNum(int roomNum);
+	int GetRoomNum();
 	void SetRoomInTime(string roomInTime);
 	string GetRoomInTime();
 };

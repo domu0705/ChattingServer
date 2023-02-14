@@ -87,6 +87,7 @@ void Manager::MakeRoom(SOCKET sockNum, int maxClnt, string roomName)//O: 대화방 
 	//send(sockNum, str.c_str(), int(str.size()), 0);
 	string msg = format("** {}님이 들어오셨습니다. (현재인원 {}/{})\n\r", user->GetID(), roomAry[roomIdx].GetCurClntNum(), roomAry[roomIdx].GetMaxClntNum());
 	roomAry[roomIdx].SendMsgToRoom(msg);
+	++roomIdx;
 }
 
 void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
@@ -107,7 +108,7 @@ void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
 		else
 		{
 			User* user = GetUserFromSock(sockNum);
-			roomAry[roomIdx].EnterUser(user, GetCurTime());
+			roomAry[roomNum-1].EnterUser(user, GetCurTime());
 
 			string msg = format("** {}님이 들어오셨습니다. (현재인원 {}/{})\n\r", user->GetID(), roomAry[roomNum - 1].GetCurClntNum(), roomAry[roomNum - 1].GetMaxClntNum());
 			roomAry[roomNum - 1].SendMsgToRoom(msg);
@@ -143,6 +144,12 @@ string Manager::GetCurTime()
 	curTime = hour + ":" + min + ":" + sec;
 
 	return curTime;
+}
+
+void Manager::SendMsgToRoom(User* user, string msg) // room에서 채팅 보내기
+{
+	string msgInfo = format("{} > {}\n\r", user->GetID(), msg);
+	roomAry[user->GetRoomNum()].SendMsgToRoom(msgInfo);
 }
 
 /* tm 구조체 내부

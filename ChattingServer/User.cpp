@@ -48,6 +48,17 @@ void User::SetRoom(string _roomName)
 	SetState(ROOM);
 }
 
+void User::SetRoomNum(int _roomNum)
+{
+	this->roomNum = _roomNum;
+}
+
+int User::GetRoomNum()
+{
+	return this->roomNum ;
+}
+
+
 void User::SetRoomInTime(string _roomInTime)
 {
 	this->roomInTime = _roomInTime;

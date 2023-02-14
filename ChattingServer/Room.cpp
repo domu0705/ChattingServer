@@ -19,6 +19,7 @@ void Room::EnterUser(User* user, string enterTime) // user는 진짜 유저의 주소값.
 {
 	userAry.push_back(user);
 	user->SetRoom(name);
+	user->SetRoomNum(roomIdx);
 	user->SetState(ROOM);
 	user->SetRoomInTime(enterTime);
 	++curClntNum;
