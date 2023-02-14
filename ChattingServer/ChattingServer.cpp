@@ -171,9 +171,9 @@ int main()
 							{
 								manager.ShowRoomInfo(reads.fd_array[i], stoi(word[1]));
 							}
-							else if (word[0].compare("PF") == 0)
+							else if (word[0].compare("PF") == 0)//PF: 이용자 정보 보기
 							{
-								manager.ShowUserInfo(reads.fd_array[i]);
+								manager.ShowUserInfo(reads.fd_array[i], word[1]);
 							}
 							else if (word[0].compare("TO") == 0)
 							{

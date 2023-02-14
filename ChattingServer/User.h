@@ -40,6 +40,7 @@ public:
 	void SetID(string ID);
 	SOCKET GetSocket();
 	string GetIpAddr();
+	string GetRoom();
 	void SetRoom(string roomName);
 	void SetRoomNum(int roomNum);
 	int GetRoomNum();

@@ -43,7 +43,7 @@ private:
 	//~Manager() {}
 public:
 	map<SOCKET, User> userAry;//socket과 client 묶을 자료형
-	map<string, User> nameAry;
+	map<string, User*> nameAry;
 	vector<Room> roomAry;
 
 	Manager();
@@ -59,7 +59,7 @@ public:
 	void ShowUserList(SOCKET sockNum);
 	void ShowRoomList(SOCKET sockNum);
 	void ShowRoomInfo(SOCKET sockNum, int roomIdx);
-	void ShowUserInfo(SOCKET sockNum);
+	void ShowUserInfo(SOCKET sockNum, string targetUserID);
 	void TO(SOCKET sockNum);
 	void MakeRoom(SOCKET sockNum, int maxClnt, string roomName);
 	void JoinRoom(SOCKET sockNum,int roomNum);

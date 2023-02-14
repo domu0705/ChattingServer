@@ -26,7 +26,7 @@ void Manager::LogIn(SOCKET sockNum, string id)//명령어 안내
 	cout << "User ID : " << id << endl;
 	userAry[sockNum].SetID(id);
 	userAry[sockNum].SetState(State::LOBBY);
-	nameAry.insert(make_pair(id, userAry[sockNum]));
+	nameAry.insert(make_pair(id, &userAry[sockNum]));
 }
 
 void Manager::ShowAllCommand(SOCKET sockNum)//H: 명령어 안내
@@ -41,7 +41,7 @@ void Manager::ShowUserList(SOCKET sockNum)//US : 이용자 목록 보기 ()
 	string userInfo = "";
 	for (auto iter = nameAry.begin(); iter != nameAry.end(); iter++)
 	{
-		userInfo += "이용자: " + iter->first + "\t접속지: " + iter->second.GetIpAddr() + "\n\r";
+		userInfo += "이용자: " + iter->first + "\t접속지: " + iter->second->GetIpAddr() + "\n\r";
 		//cout << userID << "\n";
 	}
 	string msg = format("{}{}{}", header, userInfo,"\n\r명령어안내(H) 종료(X)\n\r");
@@ -68,9 +68,26 @@ void Manager::ShowRoomInfo(SOCKET sockNum,int _roomIdx)//ST :L 대화방 정보 보기
 	}
 }
 
-void Manager::ShowUserInfo(SOCKET sockNum)//PF: 이용자 정보 보기
+void Manager::ShowUserInfo(SOCKET sockNum, string targetUserID)//PF: 이용자 정보 보기
 {
-	cout << "sockNum ID : " << sockNum << endl;
+	auto iter = nameAry.find(targetUserID);
+	if (iter != nameAry.end()) 
+	{
+		if (iter->second->GetState() == 2)// 2 == ROOM. 방에 있다면 방 이름도 알려주기
+		{
+			string msg = format("** {}님은 현재 이름 {}인 채팅방에 있습니다.\n\r", targetUserID, iter->second->GetRoom());
+			send(sockNum, msg.c_str(), int(msg.size()), 0);
+		}
+		else
+		{
+			string msg = format("** {}님은 현재 로비에 있습니다.\n\r", targetUserID);//iter->second.GetState()
+			send(sockNum, msg.c_str(), int(msg.size()), 0);
+		}
+	}
+	else {
+		string msg = format("** {}님을 찾을 수 없습니다..\n\r", targetUserID);
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+	}
 }
 
 void Manager::TO(SOCKET sockNum)//쪽지 보내기

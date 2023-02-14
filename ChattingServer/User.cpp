@@ -42,6 +42,11 @@ string User::GetIpAddr()
 	return ipAddr;
 }
 
+string User::GetRoom()
+{
+	return roomName;
+}
+
 void User::SetRoom(string _roomName)
 {
 	this->roomName = _roomName;
