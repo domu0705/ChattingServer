@@ -154,9 +154,10 @@ void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
 	
 }
 
-void Manager::X(SOCKET sockNum)//끝내기
+void Manager::ExitSystem(SOCKET sockNum)//끝내기
 {
-	cout << "sockNum ID : " << sockNum << endl;
+	string msg = "\r\n----------------------------------------------\n\r 이용해주셔서 감사합니다.\n\r 오늘 하루 행복하시길 바랍니다 :) \n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
+	send(sockNum, msg.c_str(), int(msg.size()), 0);
 }
 
 void Manager::NotExistingCommend(SOCKET sockNum)//끝내기
@@ -211,8 +212,27 @@ string Manager::GetCurTime()
 	return curTime;
 }
 
-void Manager::SendMsgToRoom(User* user, string msg) // room에서 채팅 보내기
+void Manager::SendMsgToRoom(User* user, string msg) // room에서 방 내부로 채팅 보내기
 {
 	string msgInfo = format("{} > {}\n\r", user->GetID(), msg);
 	roomAry[user->GetRoomNum()].SendMsgToRoom(msgInfo);
+}
+
+void Manager::SendMsgToUser(SOCKET fromSockNum, string toUser, string msg) //쪽지 보내기
+{
+	auto destUser = nameAry.find(toUser);
+	if (destUser != nameAry.end()) {
+		User* fromUser = GetUserFromSock(fromSockNum);
+		//보내는 유저에게 메세지 전송
+		string fromUserMsg = "\n\r** 쪽지를 보냈습니다.\n\r";
+		send(fromSockNum, fromUserMsg.c_str(), int(fromUserMsg.size()), 0);
+
+		//받는 유저에게 메세지 전송
+		string toUserMsg = format("\n\r# {}님의 쪽지 ==> {}\n\r", fromUser->GetID(), msg);
+		send(destUser->second->GetSocket(), toUserMsg.c_str(), int(toUserMsg.size()), 0);
+	}
+	else {
+		string warnMsg = "\n\r** 해당 유저는 존재하지 않습니다.\n\r";
+		send(fromSockNum, warnMsg.c_str(), int(warnMsg.size()), 0);
+	}
 }

@@ -63,11 +63,12 @@ public:
 	void TO(SOCKET sockNum);
 	void MakeRoom(SOCKET sockNum, int maxClnt, string roomName);
 	void JoinRoom(SOCKET sockNum,int roomNum);
-	void X(SOCKET sockNum);
+	void ExitSystem(SOCKET sockNum);
 	void NotExistingCommend(SOCKET sockNum);
 
 	void DeleteRoom(SOCKET sockNum);
 	void ExitRoom(SOCKET sockNum);
 	string GetCurTime();
 	void SendMsgToRoom(User* user,string msg);
+	void SendMsgToUser(SOCKET sockNum, string toUser, string msg);//쪽지 보내기
 };

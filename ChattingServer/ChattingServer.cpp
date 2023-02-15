@@ -19,15 +19,9 @@
 #define BUF_SIZE 30
 
 
-string charVecToStr(vector<char> &c) //안씀
+void closeClientSock() 
 {
-	string str = "";
-	for (int i = 0;i < c.size();i++)
-	{
-		cout << "c[" << i << "]" << "= " << c[i] << endl;
-		str += c[i];
-	}
-	return str;
+
 }
 
 vector<string> split(string str, char Delimiter) {
@@ -88,7 +82,7 @@ int main()
 
 	FD_ZERO(&reads);//인자로 전달된 주소의 fd_set형 변수의 모든 비트를 0으로 초기화 함
 	FD_SET(servSock, &reads); //&reads주소의 변수에 1번 인자로 전달된 파일 디스크립터 정보를 등록함
-
+	SOCKET* targetSocket;
 	string buf;// 클라이언트의 문자열을 받아 저장할 string생성 (while문 안에서 생성하면 클라가 입력한 값들이 다 timeout돌면서 초기화돼서 사라짐)
 	char c;
 
@@ -110,7 +104,8 @@ int main()
 
 		for (int i = 0; i < int(reads.fd_count); i++)//select가 1 이상 반환됐을 때 실행됨
 		{
-			if (FD_ISSET(reads.fd_array[i], &cpyReads)) // FD_ISSET로 상태변화가 있었던(수신된 데이터가 있는 소켓의)파일 디스크립터를 찾음
+			targetSocket = &reads.fd_array[i];
+			if (FD_ISSET(*targetSocket, &cpyReads)) // FD_ISSET로 상태변화가 있었던(수신된 데이터가 있는 소켓의)파일 디스크립터를 찾음
 			{
 				if (reads.fd_array[i] == servSock) // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request) 클라와 연결
 				{
@@ -128,20 +123,27 @@ int main()
 				}
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
 				{		
-					strLen = recv(reads.fd_array[i], &c, sizeof(char), 0);
+					strLen = recv(*targetSocket, &c, sizeof(char), 0);
 
-					if (strLen == 0)    // close request!
+					if (strLen == 0 )    // close request!
 					{
-						FD_CLR(reads.fd_array[i], &reads);
+						FD_CLR(*targetSocket, &reads);
 						closesocket(cpyReads.fd_array[i]);
-						cout << "closed client:" << cpyReads.fd_array[i] << endl;
+						cout << "closed client : " << cpyReads.fd_array[i] << endl;
 					}
 					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
 						string msgBuf = buf.substr(0, buf.length() - 1);// 뒤에 자동으로 오는 \r을 제거
 						vector<string> word = split(msgBuf, ' ');
 
-						if (manager.userAry[reads.fd_array[i]].GetState() == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
+						if (word[0].compare("X") == 0)//X : 종료 요청함
+						{
+							FD_CLR(*targetSocket, &reads);
+							closesocket(cpyReads.fd_array[i]);
+							cout << "closed client : " << cpyReads.fd_array[i] << endl;
+						}
+
+						if (manager.userAry[*targetSocket].GetState() == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
 						{
 							if (word.size() > 1 && word[0] == "LOGIN" && word[1].length() > 0)
 							{
@@ -153,7 +155,7 @@ int main()
 								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
 							}
 						}
-						else if (manager.userAry[reads.fd_array[i]].GetState() == State::LOBBY)
+						else if (manager.userAry[*targetSocket].GetState() == State::LOBBY)
 						{
 							if (word[0].compare("H") == 0)
 							{
@@ -175,9 +177,9 @@ int main()
 							{
 								manager.ShowUserInfo(reads.fd_array[i], word[1]);
 							}
-							else if (word[0].compare("TO") == 0)
+							else if (word[0].compare("TO") == 0)//쪽지 보내기
 							{
-								manager.TO(reads.fd_array[i]);
+								manager.SendMsgToUser(reads.fd_array[i], word[1], word[2]);
 							}
 							else if (word[0].compare("O") == 0) // 대화방 만들기
 							{
@@ -189,14 +191,14 @@ int main()
 							}
 							else if (word[0].compare("X") == 0)
 							{
-								manager.X(reads.fd_array[i]);
+								manager.ExitSystem(reads.fd_array[i]);
 							}
 							else
 							{
 								manager.NotExistingCommend(reads.fd_array[i]);
 							}
 						}
-						else if (manager.userAry[reads.fd_array[i]].GetState() == State::ROOM)
+						else if (manager.userAry[*targetSocket].GetState() == State::ROOM)
 						{
 							if (word[0].compare("DEL") == 0)
 							{
@@ -206,9 +208,13 @@ int main()
 							{
 								manager.ExitRoom(reads.fd_array[i]);
 							}
+							else if (word[0].compare("TO") == 0)//쪽지 보내기
+							{
+								manager.SendMsgToUser(*targetSocket, word[1], word[2]);
+							}
 							else
 							{
-								manager.SendMsgToRoom(manager.GetUserFromSock(reads.fd_array[i]), msgBuf);
+								manager.SendMsgToRoom(manager.GetUserFromSock(*targetSocket), msgBuf);
 							}
 						}
 						else{}
@@ -216,7 +222,6 @@ int main()
 					}
 					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
 					{
-						//지금은 여기서 문자 하나 받자마자 바로 답함 이걸 고쳐야 함
 						buf+=c;
 					}
 				}
