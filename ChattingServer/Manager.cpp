@@ -234,13 +234,22 @@ void Manager::SendMsgToUser(SOCKET fromSockNum, string toUser, string msg) //쪽�
 	auto destUser = nameAry.find(toUser);
 	if (destUser != nameAry.end()) {
 		User* fromUser = GetUserFromSock(fromSockNum);
-		//보내는 유저에게 메세지 전송
-		string fromUserMsg = "\n\r** 쪽지를 보냈습니다.\n\r";
-		send(fromSockNum, fromUserMsg.c_str(), int(fromUserMsg.size()), 0);
 
-		//받는 유저에게 메세지 전송
-		string toUserMsg = format("\n\r# {}님의 쪽지 ==> {}\n\r", fromUser->GetID(), msg);
-		send(destUser->second->GetSocket(), toUserMsg.c_str(), int(toUserMsg.size()), 0);
+		//자기 자신에게 보내는지 확인
+		if (fromUser->GetID().compare(toUser) == 0)
+		{
+			string fromUserMsg = "\n\r** 자기 자신에게는 보낼 수 없습니다.\n\r";
+			send(fromSockNum, fromUserMsg.c_str(), int(fromUserMsg.size()), 0);
+		}
+		else//보내는 유저에게 메세지 전송
+		{
+			string fromUserMsg = "\n\r** 쪽지를 보냈습니다.\n\r";
+			send(fromSockNum, fromUserMsg.c_str(), int(fromUserMsg.size()), 0);
+
+			//받는 유저에게 메세지 전송
+			string toUserMsg = format("\n\r# {}님의 쪽지 ==> {}\n\r", fromUser->GetID(), msg);
+			send(destUser->second->GetSocket(), toUserMsg.c_str(), int(toUserMsg.size()), 0);
+		}
 	}
 	else {
 		string warnMsg = "\n\r** 해당 유저는 존재하지 않습니다.\n\r";
