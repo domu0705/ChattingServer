@@ -71,7 +71,7 @@ string Room::GetCurRoomInfo()
 		peopleInfo += "\n\r참여자: "+ (*iter)->GetID() + "\t\t 참여시간: " + (*iter)->GetRoomInTime();
 	}
 	string  boundary= Data->dataKey[Sentance_LT_BOUNDARY];
-	string msg = format("{}{}{}{}", header,roomInfo,peopleInfo,boundary);
+	string msg = format("{}{}{}\n\r{}", header,roomInfo,peopleInfo,boundary);
 	return msg;
 }
 

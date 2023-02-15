@@ -165,7 +165,7 @@ int main()
 							}
 							else if (word[0].compare("ST") == 0 && word.size() == 2)
 							{
-								manager.ShowRoomInfo(*targetSocket, stoi(word[1]));
+								manager.ShowRoomInfo(*targetSocket, word[1]);
 							}
 							else if (word[0].compare("PF") == 0 && word.size() == 2)//PF: 이용자 정보 보기
 							{
@@ -177,11 +177,11 @@ int main()
 							}
 							else if (word[0].compare("O") == 0 && word.size() == 3) // 대화방 만들기
 							{
-								manager.MakeRoom(*targetSocket, stoi(word[1]), word[2]);
+								manager.MakeRoom(*targetSocket, word[1], word[2]);
 							}
 							else if (word[0].compare("J") == 0 && word.size() == 2)
 							{
-								manager.JoinRoom(*targetSocket, stoi(word[1]));
+								manager.JoinRoom(*targetSocket, word[1]);
 							}
 							else if (word[0].compare("X") == 0)
 							{

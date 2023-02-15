@@ -8,6 +8,16 @@ Manager::Manager()
 	cout << "Data generated";
 }
 
+bool Manager::CanStoI(const string& str)
+{
+	bool canStoI = true;
+	for (int i = 0;i < str.size();++i)
+	{
+		if ((int)str[i] < '0' || (int)str[i] > '9')
+			canStoI = false;
+	}
+	return canStoI;
+}
 
 User* Manager::GetUserFromSock(SOCKET sockNum)
 {
@@ -72,8 +82,18 @@ void Manager::ShowRoomList(SOCKET sockNum)//LT : 대화방 목록 보기
 	send(sockNum, +msg.c_str(), int(msg.size()), 0);
 }
 
-void Manager::ShowRoomInfo(SOCKET sockNum,int roomIndex)//ST :L 대화방 정보 보기
+void Manager::ShowRoomInfo(SOCKET sockNum, const string& idx)//ST :L 대화방 정보 보기
 {
+	int roomIndex = 0;
+	if (!CanStoI(idx))
+	{
+		string msg = Data->dataKey[ROOM_NUM_NOT_EXIST];
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+		return;
+	}
+
+	roomIndex = stoi(idx);
+
 	if (roomIndex > roomAry.size()|| roomIndex <1 || !roomAry[roomIndex - 1].GetIsOpen())//방이 없거나 이미 닫혀있다면
 	{
 		string msg = Data->dataKey[ROOM_NUM_NOT_EXIST];
@@ -81,7 +101,7 @@ void Manager::ShowRoomInfo(SOCKET sockNum,int roomIndex)//ST :L 대화방 정보 보기
 	}
 	else
 	{
-		string msg = roomAry[roomIndex-1].GetCurRoomInfo();
+		string msg = roomAry[roomIndex -1].GetCurRoomInfo();
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 }
@@ -108,9 +128,19 @@ void Manager::ShowUserInfo(SOCKET sockNum, const string& targetUserID)//PF: 이용
 	}
 }
 
-void Manager::MakeRoom(SOCKET sockNum, int maxClnt, const string& roomName)//O: 대화방 만들기
+void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& roomName)//O: 대화방 만들기
 {
-	if (maxClnt > 20 || maxClnt < 2)
+	int maxClntNum= 0;
+	if (!CanStoI(maxClnt))
+	{
+		string msg = Data->dataKey[ROOM_MAX_CLNT];
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+		return;
+	}
+
+	maxClntNum = stoi(maxClnt);
+
+	if (maxClntNum > 20 || maxClntNum < 2) // 방 개수 이상함
 	{
 		string msg = Data->dataKey[ROOM_MAX_CLNT];
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
@@ -121,7 +151,7 @@ void Manager::MakeRoom(SOCKET sockNum, int maxClnt, const string& roomName)//O: 
 
 		//새로운 방 생성
 		Room newRoom;
-		newRoom.SetRoom(roomIdx, roomName, user->GetID(), GetCurTime(), maxClnt);
+		newRoom.SetRoom(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
 		roomAry.push_back(newRoom);
 		roomAry[roomIdx].EnterUser(user, GetCurTime());
 
@@ -135,9 +165,19 @@ void Manager::MakeRoom(SOCKET sockNum, int maxClnt, const string& roomName)//O: 
 	}
 }
 
-void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
+void Manager::JoinRoom(SOCKET sockNum, const string& roomNum)//대화방 참여하기
 {
-	if (roomNum > roomAry.size() || roomNum < 1)
+	int roomNumber = 0;
+	if (!CanStoI(roomNum))
+	{
+		string msg = format("{}{}", Data->dataKey[ROOM_NOT_EXIST], Data->dataKey[HELP_LITTLE]);
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+		return;
+	}
+
+	roomNumber = stoi(roomNum);
+
+	if (roomNumber > roomAry.size() || roomNumber < 1)
 	{	
 		string msg = format("{}{}", Data->dataKey[ROOM_NOT_EXIST], Data->dataKey[HELP_LITTLE]);
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
@@ -145,7 +185,7 @@ void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
 	}
 	else //방 번호는 존재
 	{
-		if (roomAry[roomNum - 1].GetMaxClntNum() <= roomAry[roomNum - 1].GetCurClntNum())
+		if (roomAry[roomNumber - 1].GetMaxClntNum() <= roomAry[roomNumber - 1].GetCurClntNum())
 		{
 			string msg = format("{}{}", Data->dataKey[ROOM_MAX], Data->dataKey[HELP_LITTLE]);
 			send(sockNum, msg.c_str(), int(msg.size()), 0);
@@ -153,11 +193,11 @@ void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
 		else
 		{
 			User* user = GetUserFromSock(sockNum);
-			roomAry[roomNum-1].EnterUser(user, GetCurTime());
+			roomAry[roomNumber -1].EnterUser(user, GetCurTime());
 
 			//타 유저가 입장했다는 메세지 보내기
-			string msg = format("** {}{} {}/{})\n\r", user->GetID(), Data->dataKey[OTHER_ENTERED], roomAry[roomNum - 1].GetCurClntNum(), roomAry[roomNum - 1].GetMaxClntNum());
-			roomAry[roomNum - 1].SendMsgToRoom(msg);
+			string msg = format("** {}{} {}/{})\n\r", user->GetID(), Data->dataKey[OTHER_ENTERED], roomAry[roomNumber - 1].GetCurClntNum(), roomAry[roomNumber - 1].GetMaxClntNum());
+			roomAry[roomNumber - 1].SendMsgToRoom(msg);
 		}
 	}
 	

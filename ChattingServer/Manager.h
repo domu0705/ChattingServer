@@ -37,15 +37,16 @@ public:
 	}
 
 	User* GetUserFromSock(SOCKET sockNum);
+	bool CanStoI(const string& str);
 	void SetUserToUserSockAry(SOCKET sockNum,User user);
 	void LogIn(SOCKET sockNum, const string& id);
 	void ShowAllCommand(SOCKET sockNum);
 	void ShowUserList(SOCKET sockNum);
 	void ShowRoomList(SOCKET sockNum);
-	void ShowRoomInfo(SOCKET sockNum, int roomIdx);
+	void ShowRoomInfo(SOCKET sockNum, const string& roomIdx);
 	void ShowUserInfo(SOCKET sockNum, const string& targetUserID);
-	void MakeRoom(SOCKET sockNum, int maxClnt, const string& roomName);
-	void JoinRoom(SOCKET sockNum,int roomNum);
+	void MakeRoom(SOCKET sockNum, const string& maxClnt, const string& roomName);
+	void JoinRoom(SOCKET sockNum, const string& roomNum);
 	void ExitSystem(SOCKET sockNum);
 	void NotExistingCommend(SOCKET sockNum);
 	void DeleteRoom(SOCKET sockNum);
