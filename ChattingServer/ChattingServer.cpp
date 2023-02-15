@@ -39,7 +39,6 @@ int main()
 
 	u_short portNum = 2222; // win header에서 unsigned short 를 define한 것이 u_short 
 
-	//MAKEWORD(2, 2):사용할 소켓의 버전이 2.2 (즉, 주버전 2,부버전2) 로 0x0202를 전달해야함. makeword는 2,2를 바이트 단위로 쪼개서 0x0202를 반환해줌
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) //소켓 라이브러리 초기화
 		cout << "WSAStartup() error!";
 
@@ -73,7 +72,7 @@ int main()
 	FD_ZERO(&reads);
 	FD_SET(servSock, &reads);
 	SOCKET* targetSocket;
-	string buf;
+	//string buf;
 	char c;
 
 	while (true)
@@ -112,26 +111,23 @@ int main()
 					send(clntSock, msg.c_str(), int(msg.size()), 0);   // c_str 는 string을 char * 로 변환
 				}
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
-				{		
+				{	
 					strLen = recv(*targetSocket, &c, sizeof(char), 0);
-					cout << "targetSocket = " << targetSocket << endl;
-					cout << "strLen은 :" << strLen << "c:" << c << "!"<<endl;
+					User* user = manager.GetUserFromSock(*targetSocket);
+
 					if (strLen == 0 )    // close request!
 					{
-
 						FD_CLR(*targetSocket, &reads);
 						closesocket(cpyReads.fd_array[i]);
-						cout << "여긴 언제오지 closed client : " << cpyReads.fd_array[i] << endl;
 					}
 					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
-						string msgBuf = buf.substr(0, buf.length() - 1);// 뒤에 자동으로 오는 \r을 제거
-						cout << "msgBuf =" << msgBuf << "~" << endl;
+						string msgBuf = user->buffer.substr(0, user->buffer.length() - 1);// 뒤에 자동으로 오는 \r을 제거
 						vector<string> word = split(msgBuf, ' ');
 
 						if (word.size() == 0) //아무것도 입력안하고 엔터만 침
 						{
-							buf.clear();
+							user->buffer.clear();
 							continue;
 						}
 						if (word[0].compare("X") == 0)//X : 종료 요청함
@@ -218,11 +214,11 @@ int main()
 							}
 						}
 						else{}
-						buf.clear();
+						user->buffer.clear();
 					}
 					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
 					{
-						buf+=c;
+						user->buffer +=c;
 					}
 				}
 			}

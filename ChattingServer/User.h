@@ -32,6 +32,7 @@ private:
 	string roomInTime;//방에 참가한 시간
 
 public:
+	string buffer;
 	User();
 	User(SOCKET socketNum, const string& ipAddr);
 
