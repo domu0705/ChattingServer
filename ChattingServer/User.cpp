@@ -4,7 +4,8 @@ User::User()
 {
 	state = WAITING;
 }
-User::User(SOCKET num,string ip)
+
+User::User(SOCKET num, const string& ip)
 {
 	this->socketNum = num;
 	this->state = WAITING;
@@ -16,7 +17,7 @@ State User::GetState()
 	return state;
 }
 
-void User::SetState(State newState)
+void User::SetState(const State& newState)
 {
 	this->state = newState;
 	//cout << "SetState = " << state << endl;
@@ -27,7 +28,7 @@ string User::GetID()
 	return id;
 }
 
-void User::SetID(string nickName)
+void User::SetID(const string& nickName)
 {
 	this->id = nickName;
 }
@@ -47,7 +48,7 @@ string User::GetRoom()
 	return roomName;
 }
 
-void User::SetRoom(string name)
+void User::SetRoom(const string& name)
 {
 	this->roomName = name;
 	SetState(ROOM);
@@ -55,7 +56,7 @@ void User::SetRoom(string name)
 
 void User::SetRoomNum(int num)
 {
-	this->roomNum = num;
+	roomNum = num;
 }
 
 int User::GetRoomNum()
@@ -64,7 +65,7 @@ int User::GetRoomNum()
 }
 
 
-void User::SetRoomInTime(string time)
+void User::SetRoomInTime(const string& time)
 {
 	this->roomInTime = time;
 }

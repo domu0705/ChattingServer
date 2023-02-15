@@ -16,7 +16,8 @@ enum State
 {
 	WAITING,
 	LOBBY,
-	ROOM
+	ROOM,
+	LOGOUT
 };
 
 class User
@@ -32,18 +33,18 @@ private:
 
 public:
 	User();
-	User(SOCKET socketNum, string ipAddr);
+	User(SOCKET socketNum, const string& ipAddr);
 
 	State GetState();
-	void SetState(State newState);
+	void SetState(const State& newState);
 	string GetID();
-	void SetID(string ID);
+	void SetID(const string& ID);
 	SOCKET GetSocket();
 	string GetIpAddr();
 	string GetRoom();
-	void SetRoom(string roomName);
+	void SetRoom(const string& roomName);
 	void SetRoomNum(int roomNum);
 	int GetRoomNum();
-	void SetRoomInTime(string roomInTime);
+	void SetRoomInTime(const string& roomInTime);
 	string GetRoomInTime();
 };

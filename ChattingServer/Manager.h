@@ -38,19 +38,19 @@ public:
 
 	User* GetUserFromSock(SOCKET sockNum);
 	void SetUserToUserSockAry(SOCKET sockNum,User user);
-	void LogIn(SOCKET sockNum, string id);
+	void LogIn(SOCKET sockNum, const string& id);
 	void ShowAllCommand(SOCKET sockNum);
 	void ShowUserList(SOCKET sockNum);
 	void ShowRoomList(SOCKET sockNum);
 	void ShowRoomInfo(SOCKET sockNum, int roomIdx);
-	void ShowUserInfo(SOCKET sockNum, string targetUserID);
-	void MakeRoom(SOCKET sockNum, int maxClnt, string roomName);
+	void ShowUserInfo(SOCKET sockNum, const string& targetUserID);
+	void MakeRoom(SOCKET sockNum, int maxClnt, const string& roomName);
 	void JoinRoom(SOCKET sockNum,int roomNum);
 	void ExitSystem(SOCKET sockNum);
 	void NotExistingCommend(SOCKET sockNum);
 	void DeleteRoom(SOCKET sockNum);
 	void ExitRoom(SOCKET sockNum);
 	string GetCurTime();
-	void SendMsgToRoom(User* user,string msg);
-	void SendMsgToUser(SOCKET sockNum, string toUser, string msg);//쪽지 보내기
+	void SendMsgToRoom(User* user, const string& msg);
+	void SendMsgToUser(SOCKET sockNum, const string& toUser, const string& msg);//쪽지 보내기
 };

@@ -27,8 +27,8 @@ private:
 public:
 	Room();
 
-	void SetRoom(int roomIdx, string name, string owner, string genTime, int maxClnt);
-	void EnterUser(User* user,string enterTime);
+	void SetRoom(int roomIdx, const string& name, const string& owner, const string& genTime, int maxClnt);
+	void EnterUser(User* user, const string& enterTime);
 	void ExitUser(User* user);
 	int GetRoomIdx();
 	int GetCurClntNum();
@@ -36,9 +36,9 @@ public:
 	void SetMaxClntNum(int maxClntNum);
 	set<User*> GetUserAry();
 	string GetCurRoomInfo();
-	void SendMsgToRoom(string msg);
+	void SendMsgToRoom(const string& msg);
 	void CloseRoom();
 	void ExitRoom(User* user);
 	bool GetIsOpen();
-	string GetRoomName();
+	const string& GetRoomName();
 };

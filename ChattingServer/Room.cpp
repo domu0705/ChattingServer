@@ -5,17 +5,17 @@ Room::Room()
 	curClntNum = 0;
 }
 
-void Room::SetRoom(int _roomIdx, string _name, string _owner, string _genTime, int _maxClnt)
+void Room::SetRoom(int idx, const string& roomName, const string& id, const string& time, int num)
 {
-	roomIdx = _roomIdx;
-	name = _name;
-	owner = _owner;
+	roomIdx = idx;
+	name = roomName;
+	owner = id;
 	isOpen = true;
-	genTime = _genTime;
-	maxClntNum = _maxClnt;
+	genTime = time;
+	maxClntNum = num;
 }
 
-void Room::EnterUser(User* user, string enterTime) // user는 진짜 유저의 주소값.
+void Room::EnterUser(User* user, const string& enterTime) // user는 진짜 유저의 주소값.
 {
 	userAry.insert(user);
 	user->SetRoom(name);
@@ -54,9 +54,9 @@ int Room::GetMaxClntNum()
 	return maxClntNum;
 }
 
-void Room::SetMaxClntNum(int _maxClntNum)
+void Room::SetMaxClntNum(int num)
 {
-	maxClntNum = _maxClntNum;
+	maxClntNum = num;
 }
 
 string Room::GetCurRoomInfo()
@@ -70,15 +70,15 @@ string Room::GetCurRoomInfo()
 		peopleInfo += "\n\r참여자: "+ (*iter)->GetID() + "\t\t 참여시간: " + (*iter)->GetRoomInTime();
 	}
 	string  boundary= "\n\r----------------------------------------------------------------\n\r명령어안내(H) 종료(X)\n\r선택>";
-
-	return header + roomInfo + peopleInfo + boundary;
+	string msg = format("{}{}{}{}", header,roomInfo,peopleInfo,boundary);
+	return msg;
 }
 
-void Room::SendMsgToRoom(string msg)
+void Room::SendMsgToRoom(const string& msg)
 {
 	//방안의 모든 클라이언트에게 메세지 보내기
-	for (auto iter = userAry.begin();iter != userAry.end();iter++)
 	{
+	for (auto iter = userAry.begin();iter != userAry.end();iter++)
 		send((*iter)->GetSocket(), msg.c_str(), int(msg.size()), 0);
 	}
 }
@@ -108,7 +108,7 @@ bool Room::GetIsOpen()
 	return isOpen;
 }
 
-string Room::GetRoomName()
+const string& Room::GetRoomName()
 {
 	return name;
 }

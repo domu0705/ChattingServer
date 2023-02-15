@@ -19,7 +19,7 @@ void Manager::SetUserToUserSockAry(SOCKET sockNum, User user)
 
 }
 
-void Manager::LogIn(SOCKET sockNum, string id)//명령어 안내
+void Manager::LogIn(SOCKET sockNum, const string& id)//명령어 안내
 {
 	auto iter = nameAry.find(id);
 	if (iter != nameAry.end())//중복 아이디 존재
@@ -74,21 +74,21 @@ void Manager::ShowRoomList(SOCKET sockNum)//LT : 대화방 목록 보기
 	send(sockNum, +msg.c_str(), int(msg.size()), 0);
 }
 
-void Manager::ShowRoomInfo(SOCKET sockNum,int _roomIdx)//ST :L 대화방 정보 보기
+void Manager::ShowRoomInfo(SOCKET sockNum,int roomIndex)//ST :L 대화방 정보 보기
 {
-	if (_roomIdx > roomAry.size()|| _roomIdx <1 || !roomAry[_roomIdx - 1].GetIsOpen())//방이 없거나 이미 닫혀있다면
+	if (roomIndex > roomAry.size()|| roomIndex <1 || !roomAry[roomIndex - 1].GetIsOpen())//방이 없거나 이미 닫혀있다면
 	{
 		string msg = "** 해당 번호의 방은 존재하지 않습니다.\n\r";
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 	else
 	{
-		string msg = roomAry[_roomIdx-1].GetCurRoomInfo();
+		string msg = roomAry[roomIndex-1].GetCurRoomInfo();
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 }
 
-void Manager::ShowUserInfo(SOCKET sockNum, string targetUserID)//PF: 이용자 정보 보기
+void Manager::ShowUserInfo(SOCKET sockNum, const string& targetUserID)//PF: 이용자 정보 보기
 {
 	auto iter = nameAry.find(targetUserID);
 	if (iter != nameAry.end()) 
@@ -110,7 +110,7 @@ void Manager::ShowUserInfo(SOCKET sockNum, string targetUserID)//PF: 이용자 정보
 	}
 }
 
-void Manager::MakeRoom(SOCKET sockNum, int maxClnt, string roomName)//O: 대화방 만들기
+void Manager::MakeRoom(SOCKET sockNum, int maxClnt, const string& roomName)//O: 대화방 만들기
 {
 	if (maxClnt > 20 || maxClnt < 2)
 	{
@@ -167,8 +167,12 @@ void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
 
 void Manager::ExitSystem(SOCKET sockNum)//끝내기
 {
+	User* user = GetUserFromSock(sockNum);
+	user->SetState(LOGOUT);
 	string msg = "\r\n----------------------------------------------\n\r 이용해주셔서 감사합니다.\n\r 오늘 하루 행복하시길 바랍니다 :) \n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
 	send(sockNum, msg.c_str(), int(msg.size()), 0);
+	nameAry.erase(user->GetID());
+
 }
 
 void Manager::NotExistingCommend(SOCKET sockNum)//끝내기
@@ -205,7 +209,7 @@ void Manager::ExitRoom(SOCKET sockNum)
 	roomAry[user->GetRoomNum()].ExitRoom(user);
 }
 
-string Manager::GetCurTime() 
+string Manager::GetCurTime()
 {
 	string curTime = "";
 	time_t timer = time(NULL);
@@ -223,13 +227,13 @@ string Manager::GetCurTime()
 	return curTime;
 }
 
-void Manager::SendMsgToRoom(User* user, string msg) // room에서 방 내부로 채팅 보내기
+void Manager::SendMsgToRoom(User* user, const string& msg) // room에서 방 내부로 채팅 보내기
 {
 	string msgInfo = format("{} > {}\n\r", user->GetID(), msg);
 	roomAry[user->GetRoomNum()].SendMsgToRoom(msgInfo);
 }
 
-void Manager::SendMsgToUser(SOCKET fromSockNum, string toUser, string msg) //쪽지 보내기
+void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const string& msg) //쪽지 보내기
 {
 	auto destUser = nameAry.find(toUser);
 	if (destUser != nameAry.end()) {

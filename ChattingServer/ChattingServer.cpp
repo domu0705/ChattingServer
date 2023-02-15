@@ -10,19 +10,13 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+#include <format>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
-#include <format>
 
 #define BUF_SIZE 30
-
-
-void closeClientSock() 
-{
-
-}
 
 vector<string> split(string str, char Delimiter) {
 	istringstream ss(str);             // istringstream에 str을 담기
@@ -98,7 +92,7 @@ int main()
 			continue;
 		}
 
-		for (int i = 0; i < int(reads.fd_count); i++)//select가 1 이상 반환됐을 때 실행됨
+		for (int i = 0; i < int(reads.fd_count); ++i)//select가 1 이상 반환됐을 때 실행됨
 		{
 			targetSocket = &reads.fd_array[i];
 			if (FD_ISSET(*targetSocket, &cpyReads)) // FD_ISSET로 상태변화가 있었던(수신된 데이터가 있는 소켓의)파일 디스크립터를 찾음
@@ -153,7 +147,6 @@ int main()
 						{
 							if (word[0] == "LOGIN" && word.size() == 2 && word[1].length() > 0)//word.size() > 1 && 
 							{
-								cout << "로그인 성공" << endl;
 								manager.LogIn(*targetSocket, word[1]);
 							}
 							else //로그인 실패
