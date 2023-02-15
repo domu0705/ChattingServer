@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Data.h" />
+    <ClInclude Include="Define.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="OnOffServer.h" />
     <ClInclude Include="Room.h" />

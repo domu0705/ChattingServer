@@ -298,3 +298,18 @@ void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const stri
 		send(fromSockNum, warnMsg.c_str(), int(warnMsg.size()), 0);
 	}
 }
+
+void Manager::HandleWaiting()
+{
+
+}
+
+void Manager::HandleLobby()
+{
+
+}
+
+void Manager::HandleRoom()
+{
+
+}

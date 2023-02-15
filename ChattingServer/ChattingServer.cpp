@@ -1,9 +1,9 @@
 ﻿// -----------------------------------------------------------------------------------
 //  서버와 클라이언트의 연결 및 입출력을 관리
 // -----------------------------------------------------------------------------------
+#include "Define.h"
 #include "USER.h"
 #include "Manager.h"
-//#define _CRT_SECURE_NO_WARNINGS
 #pragma warning(disable:4996)
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -35,8 +35,6 @@ int main()
 	SOCKET servSock, clntSock;
 	SOCKADDR_IN servAddr, clntAddr;
 
-	u_short portNum = 2222; 
-
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) 
 		cout << "WSAStartup() error!";
 
@@ -47,21 +45,18 @@ int main()
 	memset(&servAddr, 0, sizeof(servAddr));
 	servAddr.sin_family = AF_INET; 
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr.sin_port = htons(portNum);
+	servAddr.sin_port = htons( Define::PORT_NUMBER );
 
 	if (bind(servSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 		cout << "bind() error" << endl;
-	else
-		cout << "bind() success" << endl;
 
 	if (listen(servSock, 5) == SOCKET_ERROR)
 		cout << "listen() error";
-	else
-		cout << "listen() success" << endl;
+
 
 	//SELECT 사용환경 설정
 	TIMEVAL timeout;
-	fd_set reads, cpyReads;//파일 디스크립터 배열(0,1로 표현되는 bit단위)
+	fd_set reads, cpyReads;
 
 	int adrSz;
 	int strLen, result;
@@ -69,14 +64,13 @@ int main()
 	FD_ZERO(&reads);
 	FD_SET(servSock, &reads);
 	SOCKET* targetSocket;
-	//string buf;
 	char c;
 
 	while (true)
 	{
 		cpyReads = reads;
-		timeout.tv_sec = 5;
-		timeout.tv_usec = 0;
+		timeout.tv_sec = Define::TV_SEC;
+		timeout.tv_usec = Define::TV_USEC;
 
 		if ((result = select(0, &cpyReads, 0, 0, &timeout)) == SOCKET_ERROR)
 		{
@@ -121,7 +115,6 @@ int main()
 				}
 				else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 				{
-					cout << "???" << endl;
 					string msgBuf = user->buffer.substr(0, user->buffer.length() - 1);// 뒤에 자동으로 오는 \r을 제거
 					vector<string> word = split(msgBuf, ' ');
 
@@ -139,7 +132,8 @@ int main()
 						continue;
 					}
 
-					if (manager.userAry[*targetSocket].GetState() == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
+					int curState = manager.userAry[*targetSocket].GetState();
+					if (curState == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
 					{
 						if (word[0] == "LOGIN" && word.size() == 2 && word[1].length() > 0)//word.size() > 1 && 
 						{
@@ -151,7 +145,7 @@ int main()
 							send(*targetSocket, msg.c_str(), int(msg.size()), 0);
 						}
 					}
-					else if (manager.userAry[*targetSocket].GetState() == State::LOBBY)
+					else if (curState == State::LOBBY)
 					{
 						if (word[0].compare("H") == 0)
 						{
@@ -194,7 +188,7 @@ int main()
 							manager.NotExistingCommend(reads.fd_array[i]);
 						}
 					}
-					else if (manager.userAry[*targetSocket].GetState() == State::ROOM)
+					else if (curState == State::ROOM)
 					{
 						if (word[0].compare("DEL") == 0)
 						{
@@ -215,10 +209,9 @@ int main()
 					}
 					user->buffer.clear();
 				}
-				else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
+				else 
 				{
 					user->buffer +=c;
-					cout << "user->buffer=" << user->buffer << endl;
 				}
 			}
 			

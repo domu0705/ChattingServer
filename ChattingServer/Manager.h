@@ -54,4 +54,7 @@ public:
 	string GetCurTime();
 	void SendMsgToRoom(User* user, const string& msg);
 	void SendMsgToUser(SOCKET sockNum, const string& toUser, const string& msg);//쪽지 보내기
+	void HandleWaiting();
+	void HandleLobby();
+	void HandleRoom();
 };
