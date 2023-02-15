@@ -27,14 +27,12 @@ void closeClientSock()
 vector<string> split(string str, char Delimiter) {
 	istringstream ss(str);             // istringstream에 str을 담기
 	string buffer;                      // 구분자를 기준으로 절삭된 문자열이 담겨지는 버퍼
-
 	vector<string> result;
 
 	// istringstream은 istream을 상속받으므로 getline을 사용할 수 있음
 	while (getline(ss, buffer, Delimiter)) {
 		result.push_back(buffer);               // 절삭된 문자열을 vector에 저장
 	}
-
 	return result;
 }
 
@@ -46,7 +44,6 @@ int main()
 	SOCKADDR_IN servAddr, clntAddr;//68p
 
 	u_short portNum = 2222; // win header에서 unsigned short 를 define한 것이 u_short 
-
 
 	//MAKEWORD(2, 2):사용할 소켓의 버전이 2.2 (즉, 주버전 2,부버전2) 로 0x0202를 전달해야함. makeword는 2,2를 바이트 단위로 쪼개서 0x0202를 반환해줌
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) //소켓 라이브러리 초기화
@@ -67,11 +64,10 @@ int main()
 	else
 		cout << "bind() success" << endl;
 
-	if (listen(servSock, 5) == SOCKET_ERROR) //listen()은 성공시 0(숫자 0), 실패시 SOCKET_ERROR 를 반환. listen()을 통해 hServSock 을 서버소켓으로 완성.클라의 연결 요청을 받을 수 있는 상태가 됨
+	if (listen(servSock, 5) == SOCKET_ERROR)
 		cout << "listen() error";
 	else
 		cout << "listen() success" << endl;
-
 
 	//SELECT 사용환경 설정
 	TIMEVAL timeout;
@@ -80,13 +76,13 @@ int main()
 	int adrSz;
 	int strLen, result;
 
-	FD_ZERO(&reads);//인자로 전달된 주소의 fd_set형 변수의 모든 비트를 0으로 초기화 함
-	FD_SET(servSock, &reads); //&reads주소의 변수에 1번 인자로 전달된 파일 디스크립터 정보를 등록함
+	FD_ZERO(&reads);
+	FD_SET(servSock, &reads);
 	SOCKET* targetSocket;
-	string buf;// 클라이언트의 문자열을 받아 저장할 string생성 (while문 안에서 생성하면 클라가 입력한 값들이 다 timeout돌면서 초기화돼서 사라짐)
+	string buf;
 	char c;
 
-	while (1)
+	while (true)
 	{
 		cpyReads = reads;
 		timeout.tv_sec = 5;
@@ -107,7 +103,7 @@ int main()
 			targetSocket = &reads.fd_array[i];
 			if (FD_ISSET(*targetSocket, &cpyReads)) // FD_ISSET로 상태변화가 있었던(수신된 데이터가 있는 소켓의)파일 디스크립터를 찾음
 			{
-				if (reads.fd_array[i] == servSock) // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request) 클라와 연결
+				if (*targetSocket == servSock) // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request) 클라와 연결
 				{
 					adrSz = sizeof(clntAddr);
 					clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
@@ -124,74 +120,85 @@ int main()
 				else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
 				{		
 					strLen = recv(*targetSocket, &c, sizeof(char), 0);
-
+					cout << "targetSocket = " << targetSocket << endl;
+					cout << "strLen은 :" << strLen << "c:" << c << "!"<<endl;
 					if (strLen == 0 )    // close request!
 					{
+
 						FD_CLR(*targetSocket, &reads);
 						closesocket(cpyReads.fd_array[i]);
-						cout << "closed client : " << cpyReads.fd_array[i] << endl;
+						cout << "여긴 언제오지 closed client : " << cpyReads.fd_array[i] << endl;
 					}
 					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
 						string msgBuf = buf.substr(0, buf.length() - 1);// 뒤에 자동으로 오는 \r을 제거
+						cout << "msgBuf =" << msgBuf << "~" << endl;
 						vector<string> word = split(msgBuf, ' ');
 
+						if (word.size() == 0) //아무것도 입력안하고 엔터만 침
+						{
+							buf.clear();
+							continue;
+						}
 						if (word[0].compare("X") == 0)//X : 종료 요청함
 						{
+							manager.ExitSystem(*targetSocket);
 							FD_CLR(*targetSocket, &reads);
 							closesocket(cpyReads.fd_array[i]);
 							cout << "closed client : " << cpyReads.fd_array[i] << endl;
+							continue;
 						}
 
 						if (manager.userAry[*targetSocket].GetState() == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
 						{
-							if (word.size() > 1 && word[0] == "LOGIN" && word[1].length() > 0)
+							if (word[0] == "LOGIN" && word.size() == 2 && word[1].length() > 0)//word.size() > 1 && 
 							{
-								manager.LogIn(reads.fd_array[i], word[1]);
+								cout << "로그인 성공" << endl;
+								manager.LogIn(*targetSocket, word[1]);
 							}
 							else //로그인 실패
 							{
 								string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.\n\r";
-								send(reads.fd_array[i], msg.c_str(), int(msg.size()), 0);
+								send(*targetSocket, msg.c_str(), int(msg.size()), 0);
 							}
 						}
 						else if (manager.userAry[*targetSocket].GetState() == State::LOBBY)
 						{
 							if (word[0].compare("H") == 0)
 							{
-								manager.ShowAllCommand(reads.fd_array[i]);
+								manager.ShowAllCommand(*targetSocket);
 							}
 							else if (word[0].compare("US") == 0) // compare() : 같으면 0 , 다르면 -1 리턴
 							{
-								manager.ShowUserList(reads.fd_array[i]);
+								manager.ShowUserList(*targetSocket);
 							}
 							else if (word[0].compare("LT") == 0)//대화방 목록 보기
 							{
-								manager.ShowRoomList(reads.fd_array[i]);
+								manager.ShowRoomList(*targetSocket);
 							}
-							else if (word[0].compare("ST") == 0)
+							else if (word[0].compare("ST") == 0 && word.size() == 2)
 							{
-								manager.ShowRoomInfo(reads.fd_array[i], stoi(word[1]));
+								manager.ShowRoomInfo(*targetSocket, stoi(word[1]));
 							}
-							else if (word[0].compare("PF") == 0)//PF: 이용자 정보 보기
+							else if (word[0].compare("PF") == 0 && word.size() == 2)//PF: 이용자 정보 보기
 							{
-								manager.ShowUserInfo(reads.fd_array[i], word[1]);
+								manager.ShowUserInfo(*targetSocket, word[1]);
 							}
-							else if (word[0].compare("TO") == 0)//쪽지 보내기
+							else if (word[0].compare("TO") == 0 && word.size() == 3)//쪽지 보내기
 							{
-								manager.SendMsgToUser(reads.fd_array[i], word[1], word[2]);
+								manager.SendMsgToUser(*targetSocket, word[1], word[2]);
 							}
-							else if (word[0].compare("O") == 0) // 대화방 만들기
+							else if (word[0].compare("O") == 0 && word.size() == 3) // 대화방 만들기
 							{
-								manager.MakeRoom(reads.fd_array[i], stoi(word[1]), word[2]);
+								manager.MakeRoom(*targetSocket, stoi(word[1]), word[2]);
 							}
-							else if (word[0].compare("J") == 0)
+							else if (word[0].compare("J") == 0 && word.size() == 2)
 							{
-								manager.JoinRoom(reads.fd_array[i], stoi(word[1]));
+								manager.JoinRoom(*targetSocket, stoi(word[1]));
 							}
 							else if (word[0].compare("X") == 0)
 							{
-								manager.ExitSystem(reads.fd_array[i]);
+								manager.ExitSystem(*targetSocket);
 							}
 							else
 							{
@@ -202,13 +209,13 @@ int main()
 						{
 							if (word[0].compare("DEL") == 0)
 							{
-								manager.DeleteRoom(reads.fd_array[i]);
+								manager.DeleteRoom(*targetSocket);
 							}
 							else if (word[0].compare("Q") == 0)
 							{
-								manager.ExitRoom(reads.fd_array[i]);
+								manager.ExitRoom(*targetSocket);
 							}
-							else if (word[0].compare("TO") == 0)//쪽지 보내기
+							else if (word[0].compare("TO") == 0 && word.size() == 3)//쪽지 보내기
 							{
 								manager.SendMsgToUser(*targetSocket, word[1], word[2]);
 							}

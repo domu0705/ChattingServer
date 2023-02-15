@@ -8,9 +8,9 @@
 #include "Data.h"
 #include "Room.h"
 #include "User.h"
+
 #include <winsock2.h>
 #include <ws2tcpip.h>
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -18,29 +18,13 @@
 #include <ctime> 
 #include <format>
 
-/*
-enum Command
-{
-	H,
-	US,
-	LT,
-	ST,
-	PF,
-	TO,
-	O,
-	J,
-	X
-};
-*/
 
 class Manager
 {
 private:
-	static Manager* instance;
 	Data Data;
 	int roomIdx;
-	//Manager& operator=(const Manager& ref) {}
-	//~Manager() {}
+
 public:
 	map<SOCKET, User> userAry;//socket과 client 묶을 자료형
 	map<string, User*> nameAry;
@@ -51,21 +35,19 @@ public:
 		static Manager s;
 		return s;
 	}
+
 	User* GetUserFromSock(SOCKET sockNum);
 	void SetUserToUserSockAry(SOCKET sockNum,User user);
-
 	void LogIn(SOCKET sockNum, string id);
 	void ShowAllCommand(SOCKET sockNum);
 	void ShowUserList(SOCKET sockNum);
 	void ShowRoomList(SOCKET sockNum);
 	void ShowRoomInfo(SOCKET sockNum, int roomIdx);
 	void ShowUserInfo(SOCKET sockNum, string targetUserID);
-	void TO(SOCKET sockNum);
 	void MakeRoom(SOCKET sockNum, int maxClnt, string roomName);
 	void JoinRoom(SOCKET sockNum,int roomNum);
 	void ExitSystem(SOCKET sockNum);
 	void NotExistingCommend(SOCKET sockNum);
-
 	void DeleteRoom(SOCKET sockNum);
 	void ExitRoom(SOCKET sockNum);
 	string GetCurTime();

@@ -21,12 +21,20 @@ void Manager::SetUserToUserSockAry(SOCKET sockNum, User user)
 
 void Manager::LogIn(SOCKET sockNum, string id)//명령어 안내
 {
-	string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
-	send(sockNum, msg.c_str(), int(msg.size()), 0);
-	cout << "User ID : " << id << endl;
-	userAry[sockNum].SetID(id);
-	userAry[sockNum].SetState(State::LOBBY);
-	nameAry.insert(make_pair(id, &userAry[sockNum]));
+	auto iter = nameAry.find(id);
+	if (iter != nameAry.end())//중복 아이디 존재
+	{
+		string msg = "** 아이디를 이미 사용중입니다. 다른 아이디를 사용해주세요.\n\r";
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+	}
+	else {
+		string msg = "\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
+		send(sockNum, msg.c_str(), int(msg.size()), 0);
+		cout << "User ID : " << id << endl;
+		userAry[sockNum].SetID(id);
+		userAry[sockNum].SetState(State::LOBBY);
+		nameAry.insert(make_pair(id, &userAry[sockNum]));
+	}
 }
 
 void Manager::ShowAllCommand(SOCKET sockNum)//H: 명령어 안내
@@ -102,29 +110,32 @@ void Manager::ShowUserInfo(SOCKET sockNum, string targetUserID)//PF: 이용자 정보
 	}
 }
 
-void Manager::TO(SOCKET sockNum)//쪽지 보내기
-{
-	cout << "sockNum ID : " << sockNum << endl;
-}
-
 void Manager::MakeRoom(SOCKET sockNum, int maxClnt, string roomName)//O: 대화방 만들기
 {
-	cout << "MakeRoom - sockNum ID : " << sockNum << endl;
-	User* user = GetUserFromSock(sockNum);
+	if (maxClnt > 20 || maxClnt < 2)
+	{
+		string str = "** 대화방 인원을 2 - 20명 사이로 입력해주세요.\n\r";
+		send(sockNum, str.c_str(), int(str.size()), 0);
+	}
+	else
+	{
+		cout << "MakeRoom - sockNum ID : " << sockNum << endl;
+		User* user = GetUserFromSock(sockNum);
 
-	//새로운 방 생성
-	Room newRoom;
-	newRoom.SetRoom(roomIdx, roomName, user->GetID(), GetCurTime(), maxClnt);
-	roomAry.push_back(newRoom);
-	roomAry[roomIdx].EnterUser(user, GetCurTime());
+		//새로운 방 생성
+		Room newRoom;
+		newRoom.SetRoom(roomIdx, roomName, user->GetID(), GetCurTime(), maxClnt);
+		roomAry.push_back(newRoom);
+		roomAry[roomIdx].EnterUser(user, GetCurTime());
 
-	//클라 알림보내기
-	string str = "** 대화방이 개설되었습니다.\n\r";
+		//클라 알림보내기
+		string str = "** 대화방이 개설되었습니다.\n\r";
 
-	send(sockNum, str.c_str(), int(str.size()), 0);
-	string msg = format("** {}님이 들어오셨습니다. (현재인원 {}/{})\n\r", user->GetID(), roomAry[roomIdx].GetCurClntNum(), roomAry[roomIdx].GetMaxClntNum());
-	roomAry[roomIdx].SendMsgToRoom(msg);
-	++roomIdx;
+		send(sockNum, str.c_str(), int(str.size()), 0);
+		string msg = format("** {}님이 들어오셨습니다. (현재인원 {}/{})\n\r", user->GetID(), roomAry[roomIdx].GetCurClntNum(), roomAry[roomIdx].GetMaxClntNum());
+		roomAry[roomIdx].SendMsgToRoom(msg);
+		++roomIdx;
+	}
 }
 
 void Manager::JoinRoom(SOCKET sockNum, int roomNum)//대화방 참여하기
