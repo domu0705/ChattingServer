@@ -3,11 +3,12 @@
 // -----------------------------------------------------------------------------------
 #pragma once
 
-#include "User.h"
 #include <vector>
 #include <set>
 #include <string>
 #include <format>
+#include "User.h"
+#include "Data.h"
 
 using namespace std;
 
@@ -23,6 +24,7 @@ private:
 	int curClntNum;
 	int maxClntNum;
 	set<User*> userAry;
+	Data* Data;
 
 public:
 	Room();

@@ -5,10 +5,6 @@
 #pragma comment(lib, "Ws2_32.lib")
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "Data.h"
-#include "Room.h"
-#include "User.h"
-
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iostream>
@@ -18,11 +14,15 @@
 #include <ctime> 
 #include <format>
 
+#include "Data.h"
+#include "Room.h"
+#include "User.h"
+
 
 class Manager
 {
 private:
-	Data Data;
+	Data* Data;
 	int roomIdx;
 
 public:

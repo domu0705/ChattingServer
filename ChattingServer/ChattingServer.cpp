@@ -16,16 +16,14 @@
 #include <string>
 #include <sstream>
 
-#define BUF_SIZE 30
 
 vector<string> split(string str, char Delimiter) {
-	istringstream ss(str);             // istringstream에 str을 담기
-	string buffer;                      // 구분자를 기준으로 절삭된 문자열이 담겨지는 버퍼
+	istringstream ss(str);      
+	string buffer;                 
 	vector<string> result;
 
-	// istringstream은 istream을 상속받으므로 getline을 사용할 수 있음
 	while (getline(ss, buffer, Delimiter)) {
-		result.push_back(buffer);               // 절삭된 문자열을 vector에 저장
+		result.push_back(buffer);         
 	}
 	return result;
 }
@@ -33,26 +31,25 @@ vector<string> split(string str, char Delimiter) {
 int main()
 {
 	Manager& manager = Manager::GetInstance();
-	WSADATA	wsaData;//WSADATA 구조체에는 Windows 소켓 구현에 대한 정보가 포함되어 있음
+	WSADATA	wsaData;
 	SOCKET servSock, clntSock;
-	SOCKADDR_IN servAddr, clntAddr;//68p
+	SOCKADDR_IN servAddr, clntAddr;
 
-	u_short portNum = 2222; // win header에서 unsigned short 를 define한 것이 u_short 
+	u_short portNum = 2222; 
 
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) //소켓 라이브러리 초기화
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) 
 		cout << "WSAStartup() error!";
 
-	servSock = socket(PF_INET, SOCK_STREAM, 0);//소켓 생성 (PF_INET= 소켓이 사용할 프로토콜 체계정보 전달(PF_INET는 1pv4라는 뜻), SOCK_STREAM=소켓의 데이터 전달 방식, 0=두컴퓨터간 통신에 사용되는 프로토콜 정보 전달)51p
+	servSock = socket(PF_INET, SOCK_STREAM, 0); 
 	if (servSock == INVALID_SOCKET)
 		cout << "socket() error";
 
 	memset(&servAddr, 0, sizeof(servAddr));
-	servAddr.sin_family = AF_INET; // AF_INET은 ipv4에 적용하는 주소체계
-	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);//73p,82p
-	servAddr.sin_port = htons(portNum);//(host to network short.)short형 데이터를 네트워크 바이트 순서에서 호스트 바이트 순서로 변환
+	servAddr.sin_family = AF_INET; 
+	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	servAddr.sin_port = htons(portNum);
 
-	//bind함수의 두번째 인자로 port,ip주소 정보를 담는 sockaddr구조체 변수의 주소값을 요구
-	if (bind(servSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)//소켓에 IP주소와 PORT번호 할당
+	if (bind(servSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 		cout << "bind() error" << endl;
 	else
 		cout << "bind() success" << endl;
@@ -122,6 +119,7 @@ int main()
 					}
 					else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
 					{
+						cout << "???" << endl;
 						string msgBuf = user->buffer.substr(0, user->buffer.length() - 1);// 뒤에 자동으로 오는 \r을 제거
 						vector<string> word = split(msgBuf, ' ');
 
@@ -219,6 +217,7 @@ int main()
 					else // 클라가 문자를 입력했다면 (수신할 데이터가 문자열인 경우)
 					{
 						user->buffer +=c;
+						cout << "user->buffer=" << user->buffer << endl;
 					}
 				}
 			}

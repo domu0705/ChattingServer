@@ -3,6 +3,7 @@
 Room::Room()
 {
 	curClntNum = 0;
+	Data = &Data::GetInstance();
 }
 
 void Room::SetRoom(int idx, const string& roomName, const string& id, const string& time, int num)
@@ -61,7 +62,7 @@ void Room::SetMaxClntNum(int num)
 
 string Room::GetCurRoomInfo()
 {
-	string header= "------------------------- 대화방 정보 -------------------------\n\r";
+	string header= Data->dataKey[ROOM_LIST_INFO];
 	string roomInfo = "[" + to_string(roomIdx+1) + "] (" + to_string(curClntNum) + "/"+ to_string(maxClntNum)+") "+name+"\n\r개설시간: "+ genTime;
 	string peopleInfo = "";
 
@@ -69,7 +70,7 @@ string Room::GetCurRoomInfo()
 	{
 		peopleInfo += "\n\r참여자: "+ (*iter)->GetID() + "\t\t 참여시간: " + (*iter)->GetRoomInTime();
 	}
-	string  boundary= "\n\r----------------------------------------------------------------\n\r명령어안내(H) 종료(X)\n\r선택>";
+	string  boundary= Data->dataKey[Sentance_LT_BOUNDARY];
 	string msg = format("{}{}{}{}", header,roomInfo,peopleInfo,boundary);
 	return msg;
 }
@@ -91,10 +92,11 @@ void Room::CloseRoom()
 void Room::ExitRoom(User* user)
 {
 	//방 나갔다는 메세지 전송
-	string msgInfo = format("{} 님이 방을 나가셨습니다.\n\r", user->GetID());
+	string msgInfo = format("{} {}", user->GetID(), Data->dataKey[ROOM_EXIT]);
 	SendMsgToRoom(msgInfo);
+
 	//방 나간 개인에게는 도움말 다시 전달
-	string msg = "명령어안내(H) 종료(X)\n\r";
+	string msg = Data->dataKey[HELP_LITTLE];
 	send(user->GetSocket(), msg.c_str(), int(msg.size()), 0);
 
 	//실제로 나가기
