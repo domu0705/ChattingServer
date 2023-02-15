@@ -27,9 +27,12 @@
 *.lib
 
 # Executables
+*.exe
 *.out
 *.app
 
+x64/
+x86/
 *.vs
 Debug
 Release
