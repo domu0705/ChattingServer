@@ -103,7 +103,8 @@ void Server::StartConn()
 						continue;
 					}
 
-					int curState = manager->userAry[*targetSocket]->GetState();
+					auto& userArray = manager->GetUserAry();
+					int curState = userArray[*targetSocket]->GetState();
 					manager->HandleState(curState, targetSocket, word, msgBuf);
 
 					user->buffer.clear();
@@ -132,5 +133,6 @@ vector<string> Server::Split(const string& str, char Delimiter) {
 	while (getline(ss, buffer, Delimiter)) {
 		words.push_back(buffer);
 	}
+
 	return words;
 }

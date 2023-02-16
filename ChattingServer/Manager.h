@@ -22,18 +22,20 @@ class Manager
 {
 private:
 	int roomIdx;
+	map<SOCKET, User*> userAry;//socket과 client 묶을 자료형
 	map<string, User*> nameAry;
 	vector<Room> roomAry;
 	Data* Data;
 
 public:
-	map<SOCKET, User*> userAry;//socket과 client 묶을 자료형
 
 	Manager();
 	static Manager& GetInstance() {
 		static Manager s;
 		return s;
 	}
+
+	inline map<SOCKET, User*>& GetUserAry() noexcept { return userAry; }
 
 	User* GetUserFromSock(SOCKET sockNum);
 	bool CanStoI(const string& str);

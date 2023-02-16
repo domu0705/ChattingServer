@@ -27,6 +27,8 @@ void Room::EnterUser(User* user, const string& enterTime) // user는 진짜 유저의 
 
 void Room::ExitUser(User* user)// user는 진짜 유저의 주소값.
 {
+	if (!user) return;
+
 	user->SetRoom("");
 	user->SetRoomNum(-1);
 	user->SetState(LOBBY);

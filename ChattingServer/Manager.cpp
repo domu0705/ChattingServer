@@ -42,6 +42,8 @@ void Manager::LogIn(SOCKET sockNum, const string& id)//명령어 안내
 	else {
 		const string& msg = Data->dataKey[LOGIN_HI];
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
+
+		if (!userAry[sockNum]) return;
 		userAry[sockNum]->SetID(id);
 		userAry[sockNum]->SetState(State::LOBBY);
 		nameAry.insert(make_pair(id, userAry[sockNum]));
