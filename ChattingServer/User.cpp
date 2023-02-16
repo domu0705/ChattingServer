@@ -1,4 +1,4 @@
-#include "USER.h"
+#include "User.h"
 
 
 User::User()
