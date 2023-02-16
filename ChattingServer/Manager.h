@@ -13,7 +13,6 @@
 #include <map>
 #include <ctime> 
 #include <format>
-
 #include "Data.h"
 #include "Room.h"
 #include "User.h"
@@ -22,13 +21,13 @@
 class Manager
 {
 private:
-	Data* Data;
 	int roomIdx;
 
 public:
 	map<SOCKET, User> userAry;//socket과 client 묶을 자료형
 	map<string, User*> nameAry;
 	vector<Room> roomAry;
+	Data* Data;
 
 	Manager();
 	static Manager& GetInstance() {
@@ -54,7 +53,4 @@ public:
 	string GetCurTime();
 	void SendMsgToRoom(User* user, const string& msg);
 	void SendMsgToUser(SOCKET sockNum, const string& toUser, const string& msg);//쪽지 보내기
-	void HandleWaiting();
-	void HandleLobby();
-	void HandleRoom();
 };

@@ -12,6 +12,7 @@
 
 using namespace std;
 
+
 class Room
 {
 
@@ -20,7 +21,7 @@ private:
 	bool isOpen;
 	string name;
 	string owner;
-	string genTime;//Ω√:∫–:√ 
+	string genTime;
 	int curClntNum;
 	int maxClntNum;
 	set<User*> userAry;

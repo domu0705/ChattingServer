@@ -144,7 +144,7 @@
     <ClCompile Include="ChattingServer.cpp" />
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Manager.cpp" />
-    <ClCompile Include="OnOffServer.cpp" />
+    <ClCompile Include="ServerConnManager.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="User.cpp" />
   </ItemGroup>
@@ -152,7 +152,7 @@
     <ClInclude Include="Data.h" />
     <ClInclude Include="Define.h" />
     <ClInclude Include="Manager.h" />
-    <ClInclude Include="OnOffServer.h" />
+    <ClInclude Include="ServerConnManager.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="User.h" />
   </ItemGroup>

@@ -30,7 +30,7 @@
     <ClCompile Include="Room.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="OnOffServer.cpp">
+    <ClCompile Include="ServerConnManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,7 +47,7 @@
     <ClInclude Include="Room.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="OnOffServer.h">
+    <ClInclude Include="ServerConnManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Define.h">

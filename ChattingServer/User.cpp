@@ -1,5 +1,6 @@
 #include "USER.h"
 
+
 User::User()
 {
 	state = WAITING;
@@ -7,9 +8,9 @@ User::User()
 
 User::User(SOCKET num, const string& ip)
 {
-	this->socketNum = num;
-	this->state = WAITING;
-	this->ipAddr = ip;
+	socketNum = num;
+	state = WAITING;
+	ipAddr = ip;
 }
 
 State User::GetState()
@@ -19,8 +20,7 @@ State User::GetState()
 
 void User::SetState(const State& newState)
 {
-	this->state = newState;
-	//cout << "SetState = " << state << endl;
+	state = newState;
 }
 
 string User::GetID()
@@ -30,12 +30,12 @@ string User::GetID()
 
 void User::SetID(const string& nickName)
 {
-	this->id = nickName;
+	id = nickName;
 }
 
 SOCKET User::GetSocket()
 {
-	return this->socketNum;
+	return socketNum;
 }
 
 string User::GetIpAddr()
@@ -50,7 +50,7 @@ string User::GetRoom()
 
 void User::SetRoom(const string& name)
 {
-	this->roomName = name;
+	roomName = name;
 	SetState(ROOM);
 }
 
@@ -61,13 +61,12 @@ void User::SetRoomNum(int num)
 
 int User::GetRoomNum()
 {
-	return this->roomNum ;
+	return roomNum ;
 }
-
 
 void User::SetRoomInTime(const string& time)
 {
-	this->roomInTime = time;
+	roomInTime = time;
 }
 
 string User::GetRoomInTime()

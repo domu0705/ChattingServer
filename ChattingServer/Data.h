@@ -6,8 +6,8 @@
 
 using namespace std;
 
-//string msg = Data.dataKey[COMMAND_HELP];
-enum Sentance
+
+enum Sentance // 사용 예시: string msg = Data.dataKey[COMMAND_HELP];
 {
 	Sentance_LT_HEADER,
 	Sentance_LT_BOUNDARY,
@@ -34,19 +34,18 @@ enum Sentance
 	ROOM_SENT_1,
 	ROOM_SENT_2,
 	ROOM_LIST_INFO,
-	ROOM_EXIT
+	ROOM_EXIT,
+	HELLO
 };
 
 class Data
 {
 private:
 public:
-	//vector<string> dataKey;
 	static Data& GetInstance() {
 		static Data s;
 		return s;
 	}
-
 	map<int,string> dataKey;
 
 	Data();

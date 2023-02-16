@@ -1,5 +1,6 @@
 #include "Data.h"
 
+
 Data::Data()
 {
 	GenerateData();
@@ -8,7 +9,6 @@ Data::Data()
 void Data::GenerateData()
 {
 	dataKey[Sentance_LT_HEADER]="------------------------- 대화방 목록-------------------------- \n\r" ;
-	
 	dataKey[Sentance_LT_BOUNDARY]="---------------------------------------------------------------\n\r명령어안내(H) 종료(X)\n\r선택>";
 	dataKey[LOGIN_ID_DUP]="**아이디를 이미 사용중입니다.다른 아이디를 사용해주세요.\n\r";
 	dataKey[LOGIN_HI]="\r\n----------------------------------------------\n\r 반갑습니다. 텍스트 채팅 서버 ver 0.1 입니다.\n\r 이용중 불편하신 점이 있으면 아래 이메일로 문의 바랍니다.\n\r 감사합니다.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r명령어안내(H) 종료(X)\n\r";
@@ -35,12 +35,5 @@ void Data::GenerateData()
 	dataKey[Sentance_LT_HEADER] = "------------------------- 대화방 목록-------------------------- \n\r";
 	dataKey[ROOM_LIST_INFO]= "------------------------- 대화방 정보 -------------------------\n\r";
 	dataKey[ROOM_EXIT] = "님이 방을 나가셨습니다.\n\r";
-	/*
-	dataKey.push_back("");
-	dataKey.push_back("");
-	dataKey.push_back("");
-	dataKey.push_back("");
-	dataKey.push_back("");
-	dataKey.push_back("");
-	*/
+	dataKey[HELLO] = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 !\n\r";
 }

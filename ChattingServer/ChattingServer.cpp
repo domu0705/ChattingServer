@@ -49,9 +49,13 @@ int main()
 
 	if (bind(servSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 		cout << "bind() error" << endl;
+	else 
+		cout << "bind() success"<<endl;
 
-	if (listen(servSock, 5) == SOCKET_ERROR)
+	if (listen(servSock, Define::BACK_LOG) == SOCKET_ERROR)
 		cout << "listen() error";
+	else 
+		cout << "listen() success" << endl;
 
 
 	//SELECT 사용환경 설정
@@ -76,7 +80,6 @@ int main()
 		{
 			break;
 		}
-
 		if (result == 0) 
 		{
 			continue;
@@ -89,7 +92,7 @@ int main()
 			{
 				continue;
 			}
-			if (*targetSocket == servSock) // 서버 소켓에서 변화가 있었는지 확인. 맞다면 연결 요청을 수락하는 과정 진행.(connection request) 클라와 연결
+			if (*targetSocket == servSock) // 서버 소켓의 변화 확인(맞다면 연결 요청을 수락)
 			{
 				adrSz = sizeof(clntAddr);
 				clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
@@ -101,9 +104,9 @@ int main()
 				FD_SET(clntSock, &reads);
 
 				string msg = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 !\n\r ";
-				send(clntSock, msg.c_str(), int(msg.size()), 0);   // c_str 는 string을 char * 로 변환
+				send(clntSock, msg.c_str(), int(msg.size()), 0); 
 			}
-			else    // 상태가 변한 소켓이 서버소켓이 아님.  즉 수신할 데이터가 있음. (read message)
+			else    // 즉 수신할 데이터가 있음. (read message)
 			{	
 				strLen = recv(*targetSocket, &c, sizeof(char), 0);
 				User* user = manager.GetUserFromSock(*targetSocket);
@@ -113,9 +116,9 @@ int main()
 					FD_CLR(*targetSocket, &reads);
 					closesocket(cpyReads.fd_array[i]);
 				}
-				else if (c == '\n') // 클라가 엔터를 입력했다면 여기로 가서 답을 줘야할 듯
+				else if (c == '\n') 
 				{
-					string msgBuf = user->buffer.substr(0, user->buffer.length() - 1);// 뒤에 자동으로 오는 \r을 제거
+					string msgBuf = user->buffer.substr(0, user->buffer.length() - 1);
 					vector<string> word = split(msgBuf, ' ');
 
 					if (word.size() == 0) //아무것도 입력안하고 엔터만 침
@@ -128,14 +131,14 @@ int main()
 						manager.ExitSystem(*targetSocket);
 						FD_CLR(*targetSocket, &reads);
 						closesocket(cpyReads.fd_array[i]);
-						cout << "closed client : " << cpyReads.fd_array[i] << endl;
+						cout << "Closed client : " << cpyReads.fd_array[i] << endl;
 						continue;
 					}
 
 					int curState = manager.userAry[*targetSocket].GetState();
-					if (curState == State::WAITING) // LOGIN 이전의 상태. 로그인해야함
+					if (curState == State::WAITING) // LOGIN 이전의 상태.
 					{
-						if (word[0] == "LOGIN" && word.size() == 2 && word[1].length() > 0)//word.size() > 1 && 
+						if (word[0] == "LOGIN" && word.size() == 2 && word[1].length() > 0)
 						{
 							manager.LogIn(*targetSocket, word[1]);
 						}
@@ -151,7 +154,7 @@ int main()
 						{
 							manager.ShowAllCommand(*targetSocket);
 						}
-						else if (word[0].compare("US") == 0) // compare() : 같으면 0 , 다르면 -1 리턴
+						else if (word[0].compare("US") == 0)
 						{
 							manager.ShowUserList(*targetSocket);
 						}
@@ -163,7 +166,7 @@ int main()
 						{
 							manager.ShowRoomInfo(*targetSocket, word[1]);
 						}
-						else if (word[0].compare("PF") == 0 && word.size() == 2)//PF: 이용자 정보 보기
+						else if (word[0].compare("PF") == 0 && word.size() == 2)//이용자 정보 보기
 						{
 							manager.ShowUserInfo(*targetSocket, word[1]);
 						}
