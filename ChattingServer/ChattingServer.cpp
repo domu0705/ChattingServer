@@ -35,7 +35,7 @@ int main()
 	SOCKET servSock, clntSock;
 	SOCKADDR_IN servAddr, clntAddr;
 
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) 
+	if (WSAStartup(MAKEWORD(Define::B_LOW, Define::B_HIGH), &wsaData) != 0)
 		cout << "WSAStartup() error!";
 
 	servSock = socket(PF_INET, SOCK_STREAM, 0); 
@@ -76,7 +76,7 @@ int main()
 		timeout.tv_sec = Define::TV_SEC;
 		timeout.tv_usec = Define::TV_USEC;
 
-		if ((result = select(0, &cpyReads, 0, 0, &timeout)) == SOCKET_ERROR)
+		if ((result = select(Define::FD_NUM, &cpyReads, 0, 0, &timeout)) == SOCKET_ERROR)
 		{
 			break;
 		}
