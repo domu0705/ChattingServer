@@ -24,7 +24,7 @@ private:
 	int roomIdx;
 
 public:
-	map<SOCKET, User> userAry;//socket과 client 묶을 자료형
+	map<SOCKET, User*> userAry;//socket과 client 묶을 자료형
 	map<string, User*> nameAry;
 	vector<Room> roomAry;
 	Data* Data;
@@ -37,7 +37,7 @@ public:
 
 	User* GetUserFromSock(SOCKET sockNum);
 	bool CanStoI(const string& str);
-	void SetUserToUserSockAry(SOCKET sockNum,User user);
+	void SetUserToUserSockAry(SOCKET sockNum,User* user);
 	void LogIn(SOCKET sockNum, const string& id);
 	void ShowAllCommand(SOCKET sockNum);
 	void ShowUserList(SOCKET sockNum);
@@ -46,11 +46,12 @@ public:
 	void ShowUserInfo(SOCKET sockNum, const string& targetUserID);
 	void MakeRoom(SOCKET sockNum, const string& maxClnt, const string& roomName);
 	void JoinRoom(SOCKET sockNum, const string& roomNum);
-	void ExitSystem(SOCKET sockNum);
+	void DisconnectUser(SOCKET sockNum);
 	void NotExistingCommend(SOCKET sockNum);
 	void DeleteRoom(SOCKET sockNum);
 	void ExitRoom(SOCKET sockNum);
 	string GetCurTime();
 	void SendMsgToRoom(User* user, const string& msg);
 	void SendMsgToUser(SOCKET sockNum, const string& toUser, const string& msg);//쪽지 보내기
+
 };

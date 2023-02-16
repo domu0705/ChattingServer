@@ -20,13 +20,15 @@ bool Manager::CanStoI(const string& str)
 
 User* Manager::GetUserFromSock(SOCKET sockNum)
 {
-	User *user = &userAry[sockNum];
+	User *user = userAry[sockNum];
 	return user;
 }
 
-void Manager::SetUserToUserSockAry(SOCKET sockNum, User user)
+void Manager::SetUserToUserSockAry(SOCKET sockNum, User* user)
 {
+	cout << "user=" << user << endl;
 	userAry.insert(make_pair(sockNum, user));
+
 }
 
 void Manager::LogIn(SOCKET sockNum, const string& id)//명령어 안내
@@ -40,10 +42,10 @@ void Manager::LogIn(SOCKET sockNum, const string& id)//명령어 안내
 	else {
 		const string& msg = Data->dataKey[LOGIN_HI];
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
-		userAry[sockNum].SetID(id);
-		userAry[sockNum].SetState(State::LOBBY);
-		nameAry.insert(make_pair(id, &userAry[sockNum]));
-		cout << "[" << id << "]" << " LOGIN Success " << endl;
+		userAry[sockNum]->SetID(id);
+		userAry[sockNum]->SetState(State::LOBBY);
+		nameAry.insert(make_pair(id, userAry[sockNum]));
+		cout << "[" << id << "]" <<"sockNum="<< sockNum << " LOGIN Success " << endl;
 	}
 }
 
@@ -148,10 +150,7 @@ void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& room
 		User* user = GetUserFromSock(sockNum);
 
 		//새로운 방 생성
-		//Room newRoom;
-		//newRoom.SetRoom(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
 		roomAry.emplace_back(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
-		//roomAry.push_back(newRoom);
 		roomAry[roomIdx].EnterUser(user, GetCurTime());
 
 		//클라 알림보내기
@@ -201,13 +200,14 @@ void Manager::JoinRoom(SOCKET sockNum, const string& roomNum)//대화방 참여하기
 	}
 }
 
-void Manager::ExitSystem(SOCKET sockNum)//끝내기
+void Manager::DisconnectUser(SOCKET sockNum)//끝내기
 {
 	User* user = GetUserFromSock(sockNum);
 	user->SetState(LOGOUT);
 	const string& msg = Data->dataKey[THX];
 	send(sockNum, msg.c_str(), int(msg.size()), 0);
 	nameAry.erase(user->GetID());
+	delete user;
 
 }
 
@@ -280,6 +280,7 @@ void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const stri
 		}
 		else//보내는 유저에게 메세지 전송
 		{
+			cout << "fromSockNum=" << fromSockNum << "  to="<<destUser->second->GetSocket() << endl;
 			const string& fromUserMsg = Data->dataKey[SECR_SEND];
 			send(fromSockNum, fromUserMsg.c_str(), int(fromUserMsg.size()), 0);
 
@@ -293,3 +294,4 @@ void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const stri
 		send(fromSockNum, warnMsg.c_str(), int(warnMsg.size()), 0);
 	}
 }
+

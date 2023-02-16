@@ -1,20 +1,20 @@
 ﻿// -----------------------------------------------------------------------------------
 //  서버와 클라이언트의 연결 및 입출력을 관리
 // -----------------------------------------------------------------------------------
-#include "Define.h"
-#include "USER.h"
-#include "Manager.h"
 #pragma warning(disable:4996)
 #pragma comment(lib, "Ws2_32.lib")
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
-
 #include <format>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <sstream>
+
+#include "Define.h"
+#include "USER.h"
+#include "Manager.h"
 
 
 vector<string> split(string str, char Delimiter) {
@@ -98,7 +98,7 @@ int main()
 				clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
 					
 				string userAddr = format("{}:{}", inet_ntoa(clntAddr.sin_addr), ntohs(clntAddr.sin_port));
-				User user(clntSock, userAddr);//유저와 소켓 연결 정보 저장
+				User* user = new User(clntSock, userAddr);		
 				manager.SetUserToUserSockAry(clntSock, user);
 
 				FD_SET(clntSock, &reads);
@@ -106,13 +106,14 @@ int main()
 				string msg = "* * 안녕하세요.텍스트 채팅 서버 ver 0.1입니다.\n\r* * 로그인 명령어(LOGIN)를 사용해주세요 !\n\r ";
 				send(clntSock, msg.c_str(), int(msg.size()), 0); 
 			}
-			else    // 즉 수신할 데이터가 있음. (read message)
+			else    // 수신할 데이터가 있음. (read message)
 			{	
 				strLen = recv(*targetSocket, &c, sizeof(char), 0);
 				User* user = manager.GetUserFromSock(*targetSocket);
 
 				if (strLen == 0 )    // close request!
 				{
+					manager.DisconnectUser(*targetSocket);
 					FD_CLR(*targetSocket, &reads);
 					closesocket(cpyReads.fd_array[i]);
 				}
@@ -121,26 +122,27 @@ int main()
 					string msgBuf = user->buffer.substr(0, user->buffer.length() - 1);
 					vector<string> word = split(msgBuf, ' ');
 
-					if (word.size() == 0) //아무것도 입력안하고 엔터만 침
+					if (word.size() == 0) //엔터만 입력받음
 					{
 						user->buffer.clear();
 						continue;
 					}
 					if (word[0].compare("X") == 0)//X : 종료 요청함
 					{
-						manager.ExitSystem(*targetSocket);
+						manager.DisconnectUser(*targetSocket);
 						FD_CLR(*targetSocket, &reads);
 						closesocket(cpyReads.fd_array[i]);
 						cout << "Closed client : " << cpyReads.fd_array[i] << endl;
 						continue;
 					}
 
-					int curState = manager.userAry[*targetSocket].GetState();
+					int curState = manager.userAry[*targetSocket]->GetState();
 					if (curState == State::WAITING) // LOGIN 이전의 상태.
 					{
 						if (word[0] == "LOGIN" && word.size() == 2 && word[1].length() > 0)
 						{
 							manager.LogIn(*targetSocket, word[1]);
+							cout << "로그인 시도 *targetSocket=" << *targetSocket << " id= " << word[1];
 						}
 						else //로그인 실패
 						{
@@ -184,7 +186,7 @@ int main()
 						}
 						else if (word[0].compare("X") == 0)
 						{
-							manager.ExitSystem(*targetSocket);
+							manager.DisconnectUser(*targetSocket);
 						}
 						else
 						{
