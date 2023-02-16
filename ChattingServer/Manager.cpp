@@ -295,3 +295,96 @@ void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const stri
 	}
 }
 
+void Manager::HandleState(int state, SOCKET* targetSocket, vector<string>& words, const string& msgBuffer)
+{
+	if (state == State::WAITING) // LOGIN 이전의 상태.
+	{
+		HandleWaiting(targetSocket, words);
+	}
+	else if (state == State::LOBBY)
+	{
+		HandleLobby(targetSocket, words);
+	}
+	else if (state == State::ROOM)
+	{
+		HandleRoom(targetSocket, words, msgBuffer);
+	}
+}
+
+void Manager::HandleWaiting(SOCKET* targetSocket, vector<string>& words)
+{
+	if (words[0] == "LOGIN" && words.size() == 2 && words[1].length() > 0)
+	{
+		LogIn(*targetSocket, words[1]);
+		cout << "로그인 시도 *targetSocket=" << *targetSocket << " id= " << words[1];
+	}
+	else //로그인 실패
+	{
+		string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.\n\r";
+		send(*targetSocket, msg.c_str(), int(msg.size()), 0);
+	}
+}
+
+void Manager::HandleLobby(SOCKET* targetSocket, vector<string>& words)
+{
+	if (words[0].compare("H") == 0)
+	{
+		ShowAllCommand(*targetSocket);
+	}
+	else if (words[0].compare("US") == 0)
+	{
+		ShowUserList(*targetSocket);
+	}
+	else if (words[0].compare("LT") == 0)//대화방 목록 보기
+	{
+		ShowRoomList(*targetSocket);
+	}
+	else if (words[0].compare("ST") == 0 && words.size() == 2)
+	{
+		ShowRoomInfo(*targetSocket, words[1]);
+	}
+	else if (words[0].compare("PF") == 0 && words.size() == 2)//이용자 정보 보기
+	{
+		ShowUserInfo(*targetSocket, words[1]);
+	}
+	else if (words[0].compare("TO") == 0 && words.size() == 3)//쪽지 보내기
+	{
+		SendMsgToUser(*targetSocket, words[1], words[2]);
+	}
+	else if (words[0].compare("O") == 0 && words.size() == 3) // 대화방 만들기
+	{
+		MakeRoom(*targetSocket, words[1], words[2]);
+	}
+	else if (words[0].compare("J") == 0 && words.size() == 2)
+	{
+		JoinRoom(*targetSocket, words[1]);
+	}
+	else if (words[0].compare("X") == 0)
+	{
+		DisconnectUser(*targetSocket);
+	}
+	else
+	{
+		NotExistingCommend(*targetSocket);
+	}
+}
+
+void Manager::HandleRoom(SOCKET* targetSocket, vector<string>& words,const string& msgBuffer)
+{
+	if (words[0].compare("DEL") == 0)
+	{
+		DeleteRoom(*targetSocket);
+	}
+	else if (words[0].compare("Q") == 0)
+	{
+		ExitRoom(*targetSocket);
+	}
+	else if (words[0].compare("TO") == 0 && words.size() == 3)//쪽지 보내기
+	{
+		SendMsgToUser(*targetSocket, words[1], words[2]);
+	}
+	else
+	{
+		SendMsgToRoom(GetUserFromSock(*targetSocket), msgBuffer);
+	}
+}

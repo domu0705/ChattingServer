@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------------------
-//  서버와 클라이언트의 연결 및 입출력을 관리
+//  서버와 클라이언트의 연결 및 데이터 전달을 관리
 // -----------------------------------------------------------------------------------
 #pragma warning(disable:4996)
 #pragma comment(lib, "Ws2_32.lib")
@@ -38,23 +38,23 @@ int main()
 	if (WSAStartup(MAKEWORD(Define::B_LOW, Define::B_HIGH), &wsaData) != 0)
 		cout << "WSAStartup() error!";
 
-	servSock = socket(PF_INET, SOCK_STREAM, 0); 
+	servSock = socket(PF_INET, SOCK_STREAM, 0);
 	if (servSock == INVALID_SOCKET)
 		cout << "socket() error";
 
 	memset(&servAddr, 0, sizeof(servAddr));
-	servAddr.sin_family = AF_INET; 
+	servAddr.sin_family = AF_INET;
 	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servAddr.sin_port = htons( Define::PORT_NUMBER );
+	servAddr.sin_port = htons(Define::PORT_NUMBER);
 
 	if (bind(servSock, (SOCKADDR*)&servAddr, sizeof(servAddr)) == SOCKET_ERROR)
 		cout << "bind() error" << endl;
-	else 
-		cout << "bind() success"<<endl;
+	else
+		cout << "bind() success" << endl;
 
 	if (listen(servSock, Define::BACK_LOG) == SOCKET_ERROR)
 		cout << "listen() error";
-	else 
+	else
 		cout << "listen() success" << endl;
 
 
@@ -119,7 +119,7 @@ int main()
 				}
 				else if (c == '\n') 
 				{
-					string msgBuf = user->buffer.substr(0, user->buffer.length() - 1);
+					const string& msgBuf = user->buffer.substr(0, user->buffer.length() - 1);
 					vector<string> word = split(msgBuf, ' ');
 
 					if (word.size() == 0) //엔터만 입력받음
@@ -137,81 +137,8 @@ int main()
 					}
 
 					int curState = manager.userAry[*targetSocket]->GetState();
-					if (curState == State::WAITING) // LOGIN 이전의 상태.
-					{
-						if (word[0] == "LOGIN" && word.size() == 2 && word[1].length() > 0)
-						{
-							manager.LogIn(*targetSocket, word[1]);
-							cout << "로그인 시도 *targetSocket=" << *targetSocket << " id= " << word[1];
-						}
-						else //로그인 실패
-						{
-							string msg = "** 올바른 사용법은 LOGIN [ID] 입니다.\n\r";
-							send(*targetSocket, msg.c_str(), int(msg.size()), 0);
-						}
-					}
-					else if (curState == State::LOBBY)
-					{
-						if (word[0].compare("H") == 0)
-						{
-							manager.ShowAllCommand(*targetSocket);
-						}
-						else if (word[0].compare("US") == 0)
-						{
-							manager.ShowUserList(*targetSocket);
-						}
-						else if (word[0].compare("LT") == 0)//대화방 목록 보기
-						{
-							manager.ShowRoomList(*targetSocket);
-						}
-						else if (word[0].compare("ST") == 0 && word.size() == 2)
-						{
-							manager.ShowRoomInfo(*targetSocket, word[1]);
-						}
-						else if (word[0].compare("PF") == 0 && word.size() == 2)//이용자 정보 보기
-						{
-							manager.ShowUserInfo(*targetSocket, word[1]);
-						}
-						else if (word[0].compare("TO") == 0 && word.size() == 3)//쪽지 보내기
-						{
-							manager.SendMsgToUser(*targetSocket, word[1], word[2]);
-						}
-						else if (word[0].compare("O") == 0 && word.size() == 3) // 대화방 만들기
-						{
-							manager.MakeRoom(*targetSocket, word[1], word[2]);
-						}
-						else if (word[0].compare("J") == 0 && word.size() == 2)
-						{
-							manager.JoinRoom(*targetSocket, word[1]);
-						}
-						else if (word[0].compare("X") == 0)
-						{
-							manager.DisconnectUser(*targetSocket);
-						}
-						else
-						{
-							manager.NotExistingCommend(reads.fd_array[i]);
-						}
-					}
-					else if (curState == State::ROOM)
-					{
-						if (word[0].compare("DEL") == 0)
-						{
-							manager.DeleteRoom(*targetSocket);
-						}
-						else if (word[0].compare("Q") == 0)
-						{
-							manager.ExitRoom(*targetSocket);
-						}
-						else if (word[0].compare("TO") == 0 && word.size() == 3)//쪽지 보내기
-						{
-							manager.SendMsgToUser(*targetSocket, word[1], word[2]);
-						}
-						else
-						{
-							manager.SendMsgToRoom(manager.GetUserFromSock(*targetSocket), msgBuf);
-						}
-					}
+					manager.HandleState(curState,targetSocket,word, msgBuf);
+
 					user->buffer.clear();
 				}
 				else 

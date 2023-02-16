@@ -54,4 +54,9 @@ public:
 	void SendMsgToRoom(User* user, const string& msg);
 	void SendMsgToUser(SOCKET sockNum, const string& toUser, const string& msg);//쪽지 보내기
 
+	void HandleState(int state, SOCKET* targetSocket, vector<string>& words, const string& msgBuffer);
+	void HandleWaiting(SOCKET* targetSocket, vector<string>& words);
+	void HandleLobby(SOCKET* targetSocket, vector<string>& words);
+	void HandleRoom(SOCKET* targetSocket, vector<string>& words, const string& msgBuffer);
+	
 };
