@@ -31,7 +31,6 @@ void Manager::SetUserToUserSockAry(SOCKET sockNum, User user)
 
 void Manager::LogIn(SOCKET sockNum, const string& id)//명령어 안내
 {
-	cout << "dld" << endl;
 	auto iter = nameAry.find(id);
 	if (iter != nameAry.end())//중복 아이디 존재
 	{
@@ -44,7 +43,7 @@ void Manager::LogIn(SOCKET sockNum, const string& id)//명령어 안내
 		userAry[sockNum].SetID(id);
 		userAry[sockNum].SetState(State::LOBBY);
 		nameAry.insert(make_pair(id, &userAry[sockNum]));
-		cout << " LOGIN SUCCESSED" << "[" << id <<"]"<<endl;
+		cout << "[" << id << "]" << " LOGIN Success " << endl;
 	}
 }
 
@@ -149,9 +148,10 @@ void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& room
 		User* user = GetUserFromSock(sockNum);
 
 		//새로운 방 생성
-		Room newRoom;
-		newRoom.SetRoom(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
-		roomAry.push_back(newRoom);
+		//Room newRoom;
+		//newRoom.SetRoom(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
+		roomAry.emplace_back(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
+		//roomAry.push_back(newRoom);
 		roomAry[roomIdx].EnterUser(user, GetCurTime());
 
 		//클라 알림보내기
@@ -273,8 +273,7 @@ void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const stri
 	if (destUser != nameAry.end()) {
 		User* fromUser = GetUserFromSock(fromSockNum);
 
-		//자기 자신에게 보내는지 확인
-		if (fromUser->GetID().compare(toUser) == 0)
+		if (fromUser->GetID().compare(toUser) == 0)//자기 자신에게 보내는지 확인
 		{
 			const string& fromUserMsg = Data->dataKey[MYSELF_NO];
 			send(fromSockNum, fromUserMsg.c_str(), int(fromUserMsg.size()), 0);

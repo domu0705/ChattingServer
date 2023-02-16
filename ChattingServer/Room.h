@@ -10,8 +10,10 @@
 #include "User.h"
 #include "Data.h"
 
+
 using namespace std;
 
+class Manager;
 
 class Room
 {
@@ -28,9 +30,9 @@ private:
 	Data* Data;
 
 public:
-	Room();
-
-	void SetRoom(int roomIdx, const string& name, const string& owner, const string& genTime, int maxClnt);
+	//Room();
+	Room(int idx, const string& roomName, const string& id, const string& time, int num);
+	//void SetRoom(int roomIdx, const string& name, const string& owner, const string& genTime, int maxClnt);
 	void EnterUser(User* user, const string& enterTime);
 	void ExitUser(User* user);
 	int GetRoomIdx();

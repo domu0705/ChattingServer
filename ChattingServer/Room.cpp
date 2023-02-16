@@ -1,13 +1,8 @@
+#include "Manager.h"
 #include "Room.h"
 
 
-Room::Room()
-{
-	curClntNum = 0;
-	Data = &Data::GetInstance();
-}
-
-void Room::SetRoom(int idx, const string& roomName, const string& id, const string& time, int num)
+Room::Room(int idx, const string& roomName, const string& id, const string& time, int num)
 {
 	roomIdx = idx;
 	name = roomName;
@@ -15,6 +10,9 @@ void Room::SetRoom(int idx, const string& roomName, const string& id, const stri
 	isOpen = true;
 	genTime = time;
 	maxClntNum = num;
+
+	curClntNum = 0;
+	Data = &Data::GetInstance();
 }
 
 void Room::EnterUser(User* user, const string& enterTime) // user는 진짜 유저의 주소값.
