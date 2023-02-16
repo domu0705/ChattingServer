@@ -1,6 +1,10 @@
+// ---------------------------------------------------------------------------------- -
+// 숫자 상수화
+// -----------------------------------------------------------------------------------
 #pragma once
 
 #include <string>
+
 
 namespace Define
 {
@@ -12,5 +16,4 @@ namespace Define
 	static constexpr long int TV_USEC			= 0;
 	static constexpr int B_LOW					= 2;
 	static constexpr int B_HIGH					= 2;
-	//static const     std::string    ABc         = "";
 }

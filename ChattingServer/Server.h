@@ -1,3 +1,6 @@
+// -----------------------------------------------------------------------------------
+// 서버-클라이언트 연결 관리
+// -----------------------------------------------------------------------------------
 #pragma once
 #pragma warning(disable:4996)
 #pragma comment(lib, "Ws2_32.lib")
@@ -9,11 +12,11 @@
 #include <vector>
 #include <string>
 #include <sstream>
-
 #include "Define.h"
 #include "Server.h"
 #include "USER.h"
 #include "Manager.h"
+
 
 class Server
 {

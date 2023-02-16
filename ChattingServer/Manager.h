@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-//  클라이언트의 입력에 따른 기능 제공
+// 채팅 시스템의 기능 제공
 // -----------------------------------------------------------------------------------
 #pragma once
 #pragma comment(lib, "Ws2_32.lib")
@@ -22,12 +22,12 @@ class Manager
 {
 private:
 	int roomIdx;
-
-public:
-	map<SOCKET, User*> userAry;//socket과 client 묶을 자료형
 	map<string, User*> nameAry;
 	vector<Room> roomAry;
 	Data* Data;
+
+public:
+	map<SOCKET, User*> userAry;//socket과 client 묶을 자료형
 
 	Manager();
 	static Manager& GetInstance() {
