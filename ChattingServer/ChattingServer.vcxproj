@@ -145,7 +145,6 @@
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Server.cpp" />
-    <ClCompile Include="ServerConnManager.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="User.cpp" />
   </ItemGroup>
@@ -154,7 +153,6 @@
     <ClInclude Include="Define.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="Server.h" />
-    <ClInclude Include="ServerConnManager.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="User.h" />
   </ItemGroup>
