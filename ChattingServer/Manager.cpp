@@ -3,7 +3,7 @@
 
 Manager::Manager()
 {
-	roomIdx = 0;
+	roomIdx = 1;
 	Data = &Data::GetInstance();
 }
 
@@ -72,11 +72,12 @@ void Manager::ShowRoomList(SOCKET sockNum)//LT : 대화방 목록 보기
 {
 	const string& header = Data->dataKey[Sentance_LT_HEADER];
 	string roomInfo = "";
-	for (int i = 0;i< roomAry.size();i++)
+	for (auto iter = roomAry.begin(); iter != roomAry.end(); iter++)
 	{
-		if (roomAry[i].GetIsOpen())
+		Room* room = iter->second;
+		if (room->GetIsOpen())
 		{
-			roomInfo += "[" + to_string(roomAry[i].GetRoomIdx()+1) + "] (" + to_string(roomAry[i].GetCurClntNum()) + "/" + to_string(roomAry[i].GetMaxClntNum()) + ") " + roomAry[i].GetRoomName()+"\n\r";
+			roomInfo += "[" + to_string(room->GetRoomIdx()) + "] (" + to_string(room->GetCurClntNum()) + "/" + to_string(room->GetMaxClntNum()) + ") " + room->GetRoomName() + "\n\r";
 		}
 	}
 	const string& boundary = Data->dataKey[Sentance_LT_BOUNDARY];;
@@ -96,14 +97,14 @@ void Manager::ShowRoomInfo(SOCKET sockNum, const string& idx)//ST :L 대화방 정보
 
 	roomIndex = stoi(idx);
 
-	if (roomIndex > roomAry.size()|| roomIndex <1 || !roomAry[roomIndex - 1].GetIsOpen())//방이 없거나 이미 닫혀있다면
+	if (roomIndex > roomAry.size()|| roomIndex <1 || !roomAry[roomIndex - 1]->GetIsOpen())//방이 없거나 이미 닫혀있다면
 	{
 		const string& msg = Data->dataKey[ROOM_NUM_NOT_EXIST];
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 	else
 	{
-		const string& msg = roomAry[roomIndex -1].GetCurRoomInfo();
+		const string& msg = roomAry[roomIndex -1]->GetCurRoomInfo();
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 }
@@ -152,15 +153,16 @@ void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& room
 		User* user = GetUserFromSock(sockNum);
 
 		//새로운 방 생성
-		roomAry.emplace_back(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
-		roomAry[roomIdx].EnterUser(user, GetCurTime());
+		Room* room = new Room(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
+		roomAry.emplace(roomIdx, room);
+		roomAry[roomIdx]->EnterUser(user, GetCurTime());
 
 		//클라 알림보내기
 		const string& str = Data->dataKey[ROOM_GEN];
 
 		send(sockNum, str.c_str(), int(str.size()), 0);
-		const string& msg = format("** {}{} {}/{})\n\r", user->GetID(), Data->dataKey[OTHER_ENTERED],roomAry[roomIdx].GetCurClntNum(), roomAry[roomIdx].GetMaxClntNum());
-		roomAry[roomIdx].SendMsgToRoom(msg);
+		const string& msg = format("** {}{} {}/{})\n\r", user->GetID(), Data->dataKey[OTHER_ENTERED],roomAry[roomIdx]->GetCurClntNum(), roomAry[roomIdx]->GetMaxClntNum());
+		roomAry[roomIdx]->SendMsgToRoom(msg);
 		++roomIdx;
 	}
 }
@@ -177,15 +179,15 @@ void Manager::JoinRoom(SOCKET sockNum, const string& roomNum)//대화방 참여하기
 
 	roomNumber = stoi(roomNum);
 
-	if (roomNumber > roomAry.size() || roomNumber < 1)
-	{	
+	map<int, Room*>::iterator iter = roomAry.find(roomNumber);
+	if (iter == roomAry.end()) {//해당 방이 없다면
 		const string& msg = format("{}{}", Data->dataKey[ROOM_NOT_EXIST], Data->dataKey[HELP_LITTLE]);
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
-		
 	}
 	else //방 번호는 존재
 	{
-		if (roomAry[roomNumber - 1].GetMaxClntNum() <= roomAry[roomNumber - 1].GetCurClntNum())
+		Room* destRoom = iter->second;
+		if (destRoom->GetMaxClntNum() <= destRoom->GetCurClntNum())
 		{
 			const string& msg = format("{}{}", Data->dataKey[ROOM_MAX], Data->dataKey[HELP_LITTLE]);
 			send(sockNum, msg.c_str(), int(msg.size()), 0);
@@ -193,11 +195,11 @@ void Manager::JoinRoom(SOCKET sockNum, const string& roomNum)//대화방 참여하기
 		else
 		{
 			User* user = GetUserFromSock(sockNum);
-			roomAry[roomNumber -1].EnterUser(user, GetCurTime());
+			destRoom->EnterUser(user, GetCurTime());
 
 			//타 유저가 입장했다는 메세지 보내기
-			const string& msg = format("** {}{} {}/{})\n\r", user->GetID(), Data->dataKey[OTHER_ENTERED], roomAry[roomNumber - 1].GetCurClntNum(), roomAry[roomNumber - 1].GetMaxClntNum());
-			roomAry[roomNumber - 1].SendMsgToRoom(msg);
+			const string& msg = format("** {}{} {}/{})\n\r", user->GetID(), Data->dataKey[OTHER_ENTERED], destRoom->GetCurClntNum(), destRoom->GetMaxClntNum());
+			destRoom->SendMsgToRoom(msg);
 		}
 	}
 }
@@ -223,10 +225,10 @@ void Manager::DeleteRoom(SOCKET sockNum)//확인
 {
 	User* user = GetUserFromSock(sockNum);
 	int curRoomNum = user->GetRoomNum();
-	set<User*> roomUserAry = roomAry[curRoomNum].GetUserAry();
+	set<User*> roomUserAry = roomAry[curRoomNum]->GetUserAry();
 
-	roomAry[curRoomNum].SetMaxClntNum(0);//방 폭파
-	roomAry[curRoomNum].CloseRoom();
+	roomAry[curRoomNum]->SetMaxClntNum(0);//방 폭파
+	roomAry[curRoomNum]->CloseRoom();
 
 	const string& msg = Data->dataKey[ROOM_DEL];
 
@@ -242,7 +244,7 @@ void Manager::DeleteRoom(SOCKET sockNum)//확인
 void Manager::ExitRoom(SOCKET sockNum)
 {
 	User* user = GetUserFromSock(sockNum);
-	roomAry[user->GetRoomNum()].ExitRoom(user);
+	roomAry[user->GetRoomNum()]->ExitRoom(user);
 }
 
 string Manager::GetCurTime()
@@ -266,7 +268,7 @@ string Manager::GetCurTime()
 void Manager::SendMsgToRoom(User* user, const string& msg) // room에서 방 내부로 채팅 보내기
 {
 	const string& msgInfo = format("{} > {}\n\r", user->GetID(), msg);
-	roomAry[user->GetRoomNum()].SendMsgToRoom(msgInfo);
+	roomAry[user->GetRoomNum()]->SendMsgToRoom(msgInfo);
 }
 
 void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const string& msg) //쪽지 보내기

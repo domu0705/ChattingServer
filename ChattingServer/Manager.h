@@ -24,7 +24,7 @@ private:
 	int roomIdx;
 	map<SOCKET, User*> userAry;//socket과 client 묶을 자료형
 	map<string, User*> nameAry;
-	vector<Room> roomAry;
+	map<int,Room*> roomAry;
 	Data* Data;
 
 public:
