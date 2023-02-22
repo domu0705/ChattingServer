@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// ¼­¹ö-Å¬¶óÀÌ¾ğÆ® ¿¬°á °ü¸®
+// ì„œë²„-í´ë¼ì´ì–¸íŠ¸ ì—°ê²° ê´€ë¦¬
 // -----------------------------------------------------------------------------------
 #pragma once
 #pragma warning(disable:4996)
@@ -26,13 +26,13 @@ private:
 	SOCKET servSock, clntSock;
 	SOCKADDR_IN servAddr, clntAddr;
 
-	//SELECT »ç¿ëÈ¯°æ ¼³Á¤
+	//SELECT ì‚¬ìš©í™˜ê²½ ì„¤ì •
 	TIMEVAL timeout;
 	fd_set reads, cpyReads;
 	int adrSz;
 	int strLen, result;
 
-	//ÀÔ·Â ÀúÀå
+	//ì…ë ¥ ì €ì¥
 	SOCKET* targetSocket;
 	char c;
 

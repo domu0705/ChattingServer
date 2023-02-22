@@ -61,7 +61,7 @@ void User::SetRoomNum(int num)
 
 int User::GetRoomNum()
 {
-	return roomNum ;
+	return roomNum;
 }
 
 void User::SetRoomInTime(const string& time)

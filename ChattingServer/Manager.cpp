@@ -20,7 +20,7 @@ bool Manager::CanStoI(const string& str)
 
 User* Manager::GetUserFromSock(SOCKET sockNum)
 {
-	User *user = userAry[sockNum];
+	User* user = userAry[sockNum];
 	return user;
 }
 
@@ -31,11 +31,12 @@ void Manager::SetUserToUserSockAry(SOCKET sockNum, User* user)
 
 }
 
-void Manager::LogIn(SOCKET sockNum, const string& id)//¸í·É¾î ¾È³»
+void Manager::LogIn(SOCKET sockNum, const string& id)//ëª…ë ¹ì–´ ì•ˆë‚´
 {
 	auto iter = nameAry.find(id);
-	if (iter != nameAry.end())//Áßº¹ ¾ÆÀÌµğ Á¸Àç
+	if (iter != nameAry.end())//ì¤‘ë³µ ì•„ì´ë”” ì¡´ì¬
 	{
+		cout << "LogIn | ì¤‘ë³µ ì•„ì´ë”” ì¡´ì¬ " << endl;
 		const string& msg = Data->dataKey[LOGIN_ID_DUP];
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
@@ -47,28 +48,28 @@ void Manager::LogIn(SOCKET sockNum, const string& id)//¸í·É¾î ¾È³»
 		userAry[sockNum]->SetID(id);
 		userAry[sockNum]->SetState(State::LOBBY);
 		nameAry.insert(make_pair(id, userAry[sockNum]));
-		cout << "[" << id << "]" <<"sockNum="<< sockNum << " LOGIN Success " << endl;
+		cout << "[" << id << "]" << "sockNum=" << sockNum << " LOGIN Success " << endl;
 	}
 }
 
-void Manager::ShowAllCommand(SOCKET sockNum)//H: ¸í·É¾î ¾È³»
+void Manager::ShowAllCommand(SOCKET sockNum)//H: ëª…ë ¹ì–´ ì•ˆë‚´
 {
 	const string& msg = Data->dataKey[COMMAND_HELP];
 	send(sockNum, msg.c_str(), int(msg.size()), 0);
 }
 
-void Manager::ShowUserList(SOCKET sockNum)//US : ÀÌ¿ëÀÚ ¸ñ·Ï º¸±â ()
+void Manager::ShowUserList(SOCKET sockNum)//US : ì´ìš©ì ëª©ë¡ ë³´ê¸° ()
 {
 	string userInfo = "";
 	for (auto iter = nameAry.begin(); iter != nameAry.end(); iter++)
 	{
-		userInfo += "ÀÌ¿ëÀÚ: " + iter->first + "\tÁ¢¼ÓÁö: " + iter->second->GetIpAddr() + "\n\r";
+		userInfo += "ì´ìš©ì: " + iter->first + "\tì ‘ì†ì§€: " + iter->second->GetIpAddr() + "\r\n";
 	}
 	const string& msg = format("{}{}{}", Data->dataKey[USERLIST_HEADER], userInfo, Data->dataKey[HELP_LITTLE]);
-	send(sockNum,  +msg.c_str(), int(msg.size()), 0);
+	send(sockNum, +msg.c_str(), int(msg.size()), 0);
 }
 
-void Manager::ShowRoomList(SOCKET sockNum)//LT : ´ëÈ­¹æ ¸ñ·Ï º¸±â
+void Manager::ShowRoomList(SOCKET sockNum)//LT : ëŒ€í™”ë°© ëª©ë¡ ë³´ê¸°
 {
 	const string& header = Data->dataKey[Sentance_LT_HEADER];
 	string roomInfo = "";
@@ -85,7 +86,7 @@ void Manager::ShowRoomList(SOCKET sockNum)//LT : ´ëÈ­¹æ ¸ñ·Ï º¸±â
 	send(sockNum, +msg.c_str(), int(msg.size()), 0);
 }
 
-void Manager::ShowRoomInfo(SOCKET sockNum, const string& idx)//ST :L ´ëÈ­¹æ Á¤º¸ º¸±â
+void Manager::ShowRoomInfo(SOCKET sockNum, const string& idx)//ST :L ëŒ€í™”ë°© ì •ë³´ ë³´ê¸°
 {
 	int roomIndex = 0;
 	if (!CanStoI(idx))
@@ -97,26 +98,26 @@ void Manager::ShowRoomInfo(SOCKET sockNum, const string& idx)//ST :L ´ëÈ­¹æ Á¤º¸
 
 	roomIndex = stoi(idx);
 
-	if (roomIndex > roomAry.size()|| roomIndex <1 || !roomAry[roomIndex - 1]->GetIsOpen())//¹æÀÌ ¾ø°Å³ª ÀÌ¹Ì ´İÇôÀÖ´Ù¸é
+	if (roomIndex > roomAry.size() || roomIndex < 1 || !roomAry[roomIndex - 1]->GetIsOpen())//ë°©ì´ ì—†ê±°ë‚˜ ì´ë¯¸ ë‹«í˜€ìˆë‹¤ë©´
 	{
 		const string& msg = Data->dataKey[ROOM_NUM_NOT_EXIST];
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 	else
 	{
-		const string& msg = roomAry[roomIndex -1]->GetCurRoomInfo();
+		const string& msg = roomAry[roomIndex - 1]->GetCurRoomInfo();
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 }
 
-void Manager::ShowUserInfo(SOCKET sockNum, const string& targetUserID)//PF: ÀÌ¿ëÀÚ Á¤º¸ º¸±â
+void Manager::ShowUserInfo(SOCKET sockNum, const string& targetUserID)//PF: ì´ìš©ì ì •ë³´ ë³´ê¸°
 {
 	auto iter = nameAry.find(targetUserID);
-	if (iter != nameAry.end()) 
+	if (iter != nameAry.end())
 	{
 		if (iter->second->GetState() == 2)
 		{
-			const string& msg = format("** {}{}{}{}", targetUserID, Data->dataKey[ROOM_SENT_1],iter->second->GetRoom(), Data->dataKey[ROOM_SENT_2]);
+			const string& msg = format("** {}{}{}{}", targetUserID, Data->dataKey[ROOM_SENT_1], iter->second->GetRoom(), Data->dataKey[ROOM_SENT_2]);
 			send(sockNum, msg.c_str(), int(msg.size()), 0);
 		}
 		else
@@ -131,9 +132,9 @@ void Manager::ShowUserInfo(SOCKET sockNum, const string& targetUserID)//PF: ÀÌ¿ë
 	}
 }
 
-void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& roomName)//O: ´ëÈ­¹æ ¸¸µé±â
+void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& roomName)//O: ëŒ€í™”ë°© ë§Œë“¤ê¸°
 {
-	int maxClntNum= 0;
+	int maxClntNum = 0;
 	if (!CanStoI(maxClnt))
 	{
 		const string& msg = Data->dataKey[ROOM_MAX_CLNT];
@@ -143,7 +144,7 @@ void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& room
 
 	maxClntNum = stoi(maxClnt);
 
-	if (maxClntNum > 20 || maxClntNum < 2) // ¹æ °³¼ö ÀÌ»óÇÔ
+	if (maxClntNum > 20 || maxClntNum < 2) // ë°© ê°œìˆ˜ ì´ìƒí•¨
 	{
 		const string& msg = Data->dataKey[ROOM_MAX_CLNT];
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
@@ -152,22 +153,22 @@ void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& room
 	{
 		User* user = GetUserFromSock(sockNum);
 
-		//»õ·Î¿î ¹æ »ı¼º
+		//ìƒˆë¡œìš´ ë°© ìƒì„±
 		Room* room = new Room(roomIdx, roomName, user->GetID(), GetCurTime(), maxClntNum);
 		roomAry.emplace(roomIdx, room);
 		roomAry[roomIdx]->EnterUser(user, GetCurTime());
 
-		//Å¬¶ó ¾Ë¸²º¸³»±â
+		//í´ë¼ ì•Œë¦¼ë³´ë‚´ê¸°
 		const string& str = Data->dataKey[ROOM_GEN];
 
 		send(sockNum, str.c_str(), int(str.size()), 0);
-		const string& msg = format("** {}{} {}/{})\n\r", user->GetID(), Data->dataKey[OTHER_ENTERED],roomAry[roomIdx]->GetCurClntNum(), roomAry[roomIdx]->GetMaxClntNum());
+		const string& msg = format("** {}{} {}/{} \r\n", user->GetID(), Data->dataKey[OTHER_ENTERED], roomAry[roomIdx]->GetCurClntNum(), roomAry[roomIdx]->GetMaxClntNum());
 		roomAry[roomIdx]->SendMsgToRoom(msg);
 		++roomIdx;
 	}
 }
 
-void Manager::JoinRoom(SOCKET sockNum, const string& roomNum)//´ëÈ­¹æ Âü¿©ÇÏ±â
+void Manager::JoinRoom(SOCKET sockNum, const string& roomNum)//ëŒ€í™”ë°© ì°¸ì—¬í•˜ê¸°
 {
 	int roomNumber = 0;
 	if (!CanStoI(roomNum))
@@ -180,11 +181,11 @@ void Manager::JoinRoom(SOCKET sockNum, const string& roomNum)//´ëÈ­¹æ Âü¿©ÇÏ±â
 	roomNumber = stoi(roomNum);
 
 	map<int, Room*>::iterator iter = roomAry.find(roomNumber);
-	if (iter == roomAry.end()) {//ÇØ´ç ¹æÀÌ ¾ø´Ù¸é
+	if (iter == roomAry.end()) {//í•´ë‹¹ ë°©ì´ ì—†ë‹¤ë©´
 		const string& msg = format("{}{}", Data->dataKey[ROOM_NOT_EXIST], Data->dataKey[HELP_LITTLE]);
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
-	else //¹æ ¹øÈ£´Â Á¸Àç
+	else //ë°© ë²ˆí˜¸ëŠ” ì¡´ì¬
 	{
 		Room* destRoom = iter->second;
 		if (destRoom->GetMaxClntNum() <= destRoom->GetCurClntNum())
@@ -197,14 +198,14 @@ void Manager::JoinRoom(SOCKET sockNum, const string& roomNum)//´ëÈ­¹æ Âü¿©ÇÏ±â
 			User* user = GetUserFromSock(sockNum);
 			destRoom->EnterUser(user, GetCurTime());
 
-			//Å¸ À¯Àú°¡ ÀÔÀåÇß´Ù´Â ¸Ş¼¼Áö º¸³»±â
-			const string& msg = format("** {}{} {}/{})\n\r", user->GetID(), Data->dataKey[OTHER_ENTERED], destRoom->GetCurClntNum(), destRoom->GetMaxClntNum());
+			//íƒ€ ìœ ì €ê°€ ì…ì¥í–ˆë‹¤ëŠ” ë©”ì„¸ì§€ ë³´ë‚´ê¸°
+			const string& msg = format("** {}{} {}/{}) \r\n", user->GetID(), Data->dataKey[OTHER_ENTERED], destRoom->GetCurClntNum(), destRoom->GetMaxClntNum());
 			destRoom->SendMsgToRoom(msg);
 		}
 	}
 }
 
-void Manager::DisconnectUser(SOCKET sockNum)//³¡³»±â
+void Manager::DisconnectUser(SOCKET sockNum)//ëë‚´ê¸°
 {
 	User* user = GetUserFromSock(sockNum);
 	user->SetState(LOGOUT);
@@ -215,24 +216,24 @@ void Manager::DisconnectUser(SOCKET sockNum)//³¡³»±â
 
 }
 
-void Manager::NotExistingCommend(SOCKET sockNum)//³¡³»±â
+void Manager::NotExistingCommend(SOCKET sockNum)//ëë‚´ê¸°
 {
 	const string& msg = Data->dataKey[COMM_NOT_EXIST];
 	send(sockNum, msg.c_str(), int(msg.size()), 0);
 }
 
-void Manager::DeleteRoom(SOCKET sockNum)//È®ÀÎ
+void Manager::DeleteRoom(SOCKET sockNum)//í™•ì¸
 {
 	User* user = GetUserFromSock(sockNum);
 	int curRoomNum = user->GetRoomNum();
 	set<User*> roomUserAry = roomAry[curRoomNum]->GetUserAry();
 
-	roomAry[curRoomNum]->SetMaxClntNum(0);//¹æ ÆøÆÄ
+	roomAry[curRoomNum]->SetMaxClntNum(0);//ë°© í­íŒŒ
 	roomAry[curRoomNum]->CloseRoom();
 
 	const string& msg = Data->dataKey[ROOM_DEL];
 
-	//¹æ ¾ÈÀÇ »ç¶÷µé ³»º¸³»±â
+	//ë°© ì•ˆì˜ ì‚¬ëŒë“¤ ë‚´ë³´ë‚´ê¸°
 	for (auto iter = roomUserAry.begin();iter != roomUserAry.end();iter++)
 	{
 		(*iter)->SetState(LOBBY);
@@ -256,40 +257,40 @@ string Manager::GetCurTime()
 	string min = to_string(t->tm_min);
 	string sec = to_string(t->tm_sec);
 
-	hour = hour.length() > 1 ? hour: "0" + hour;
-	min = min.length() > 1 ? min: "0" + min;
-	sec = sec.length() > 1 ? sec: "0" + sec;
+	hour = hour.length() > 1 ? hour : "0" + hour;
+	min = min.length() > 1 ? min : "0" + min;
+	sec = sec.length() > 1 ? sec : "0" + sec;
 
 	const string& curTime = format("{}:{}:{}", hour, min, sec);
 
 	return curTime;
 }
 
-void Manager::SendMsgToRoom(User* user, const string& msg) // room¿¡¼­ ¹æ ³»ºÎ·Î Ã¤ÆÃ º¸³»±â
+void Manager::SendMsgToRoom(User* user, const string& msg) // roomì—ì„œ ë°© ë‚´ë¶€ë¡œ ì±„íŒ… ë³´ë‚´ê¸°
 {
-	const string& msgInfo = format("{} > {}\n\r", user->GetID(), msg);
+	const string& msgInfo = format("{} > {}\r\n", user->GetID(), msg);
 	roomAry[user->GetRoomNum()]->SendMsgToRoom(msgInfo);
 }
 
-void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const string& msg) //ÂÊÁö º¸³»±â
+void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const string& msg) //ìª½ì§€ ë³´ë‚´ê¸°
 {
 	auto destUser = nameAry.find(toUser);
 	if (destUser != nameAry.end()) {
 		User* fromUser = GetUserFromSock(fromSockNum);
 
-		if (fromUser->GetID().compare(toUser) == 0)//ÀÚ±â ÀÚ½Å¿¡°Ô º¸³»´ÂÁö È®ÀÎ
+		if (fromUser->GetID().compare(toUser) == 0)//ìê¸° ìì‹ ì—ê²Œ ë³´ë‚´ëŠ”ì§€ í™•ì¸
 		{
 			const string& fromUserMsg = Data->dataKey[MYSELF_NO];
 			send(fromSockNum, fromUserMsg.c_str(), int(fromUserMsg.size()), 0);
 		}
-		else//º¸³»´Â À¯Àú¿¡°Ô ¸Ş¼¼Áö Àü¼Û
+		else//ë³´ë‚´ëŠ” ìœ ì €ì—ê²Œ ë©”ì„¸ì§€ ì „ì†¡
 		{
-			cout << "fromSockNum=" << fromSockNum << "  to="<<destUser->second->GetSocket() << endl;
+			cout << "fromSockNum=" << fromSockNum << "  to=" << destUser->second->GetSocket() << endl;
 			const string& fromUserMsg = Data->dataKey[SECR_SEND];
 			send(fromSockNum, fromUserMsg.c_str(), int(fromUserMsg.size()), 0);
 
-			//¹Ş´Â À¯Àú¿¡°Ô ¸Ş¼¼Áö Àü¼Û
-			const string& toUserMsg = format("\n\r# {}{}{}\n\r", fromUser->GetID(), Data->dataKey[SECR], msg);
+			//ë°›ëŠ” ìœ ì €ì—ê²Œ ë©”ì„¸ì§€ ì „ì†¡
+			const string& toUserMsg = format("\n\r# {}{}{}\r\n", fromUser->GetID(), Data->dataKey[SECR], msg);
 			send(destUser->second->GetSocket(), toUserMsg.c_str(), int(toUserMsg.size()), 0);
 		}
 	}
@@ -301,7 +302,7 @@ void Manager::SendMsgToUser(SOCKET fromSockNum, const string& toUser, const stri
 
 void Manager::HandleState(int state, SOCKET* targetSocket, vector<string>& words, const string& msgBuffer)
 {
-	if (state == State::WAITING) // LOGIN ÀÌÀüÀÇ »óÅÂ.
+	if (state == State::WAITING) // LOGIN ì´ì „ì˜ ìƒíƒœ.
 	{
 		HandleWaiting(targetSocket, words);
 	}
@@ -315,22 +316,30 @@ void Manager::HandleState(int state, SOCKET* targetSocket, vector<string>& words
 	}
 }
 
+//í´ë¼ê°€ Wait ìƒíƒœì¼ë•Œ ê°€ëŠ¥í•œ ëª…ë ¹ì„ ì‹¤í–‰í•˜ëŠ” í•¨ìˆ˜
 void Manager::HandleWaiting(SOCKET* targetSocket, vector<string>& words)
 {
 	if (words[0] == "LOGIN" && words.size() == 2 && words[1].length() > 0)
 	{
 		LogIn(*targetSocket, words[1]);
-		cout << "·Î±×ÀÎ ½Ãµµ *targetSocket=" << *targetSocket << " id= " << words[1];
+		cout << "ë¡œê·¸ì¸ ì‹œë„ *targetSocket=" << *targetSocket << " id= " << words[1];
 	}
-	else //·Î±×ÀÎ ½ÇÆĞ
+	else //ë¡œê·¸ì¸ ì‹¤íŒ¨
 	{
-		string msg = "** ¿Ã¹Ù¸¥ »ç¿ë¹ıÀº LOGIN [ID] ÀÔ´Ï´Ù.\n\r";
+		cout << "words[0]=" << words[0] ;
+		string msg = "** ì˜¬ë°”ë¥¸ ì‚¬ìš©ë²•ì€ LOGIN [ID] ì…ë‹ˆë‹¤.\r\n";
 		send(*targetSocket, msg.c_str(), int(msg.size()), 0);
 	}
 }
 
+//í´ë¼ê°€ Lobby ìƒíƒœì¼ë•Œ ê°€ëŠ¥í•œ ëª…ë ¹ì„ ì‹¤í–‰í•˜ëŠ” í•¨ìˆ˜
 void Manager::HandleLobby(SOCKET* targetSocket, vector<string>& words)
 {
+	cout << "words[0]=" << words[0]<<endl;
+	if (words.size() > 1)
+	{
+		cout << "words[1]" << words[1] << endl;
+	}
 	if (words[0].compare("H") == 0)
 	{
 		ShowAllCommand(*targetSocket);
@@ -339,23 +348,24 @@ void Manager::HandleLobby(SOCKET* targetSocket, vector<string>& words)
 	{
 		ShowUserList(*targetSocket);
 	}
-	else if (words[0].compare("LT") == 0)//´ëÈ­¹æ ¸ñ·Ï º¸±â
+	else if (words[0].compare("LT") == 0)//ëŒ€í™”ë°© ëª©ë¡ ë³´ê¸°
 	{
+		cout << "LT=" << words[0] << endl;
 		ShowRoomList(*targetSocket);
 	}
 	else if (words[0].compare("ST") == 0 && words.size() == 2)
 	{
 		ShowRoomInfo(*targetSocket, words[1]);
 	}
-	else if (words[0].compare("PF") == 0 && words.size() == 2)//ÀÌ¿ëÀÚ Á¤º¸ º¸±â
+	else if (words[0].compare("PF") == 0 && words.size() == 2)//ì´ìš©ì ì •ë³´ ë³´ê¸°
 	{
 		ShowUserInfo(*targetSocket, words[1]);
 	}
-	else if (words[0].compare("TO") == 0 && words.size() == 3)//ÂÊÁö º¸³»±â
+	else if (words[0].compare("TO") == 0 && words.size() == 3)//ìª½ì§€ ë³´ë‚´ê¸°
 	{
 		SendMsgToUser(*targetSocket, words[1], words[2]);
 	}
-	else if (words[0].compare("O") == 0 && words.size() == 3) // ´ëÈ­¹æ ¸¸µé±â
+	else if (words[0].compare("O") == 0 && words.size() == 3) // ëŒ€í™”ë°© ë§Œë“¤ê¸°
 	{
 		MakeRoom(*targetSocket, words[1], words[2]);
 	}
@@ -373,7 +383,8 @@ void Manager::HandleLobby(SOCKET* targetSocket, vector<string>& words)
 	}
 }
 
-void Manager::HandleRoom(SOCKET* targetSocket, vector<string>& words,const string& msgBuffer)
+//í´ë¼ê°€ Room ìƒíƒœì¼ë•Œ ê°€ëŠ¥í•œ ëª…ë ¹ì„ ì‹¤í–‰í•˜ëŠ” í•¨ìˆ˜
+void Manager::HandleRoom(SOCKET* targetSocket, vector<string>& words, const string& msgBuffer)
 {
 	if (words[0].compare("DEL") == 0)
 	{
@@ -383,7 +394,7 @@ void Manager::HandleRoom(SOCKET* targetSocket, vector<string>& words,const strin
 	{
 		ExitRoom(*targetSocket);
 	}
-	else if (words[0].compare("TO") == 0 && words.size() == 3)//ÂÊÁö º¸³»±â
+	else if (words[0].compare("TO") == 0 && words.size() == 3)//ìª½ì§€ ë³´ë‚´ê¸°
 	{
 		SendMsgToUser(*targetSocket, words[1], words[2]);
 	}

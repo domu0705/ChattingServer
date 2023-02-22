@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-//  ¹®ÀÚ¿­ Á¤º¸ ÀúÀå
+//  ë¬¸ìì—´ ì •ë³´ ì €ì¥
 // -----------------------------------------------------------------------------------
 #pragma once
 
@@ -9,7 +9,7 @@
 
 using namespace std;
 
-enum Sentance // »ç¿ë ¿¹½Ã: string msg = Data.dataKey[COMMAND_HELP];
+enum Sentance // ì‚¬ìš© ì˜ˆì‹œ: string msg = Data.dataKey[COMMAND_HELP];
 {
 	Sentance_LT_HEADER,
 	Sentance_LT_BOUNDARY,
@@ -17,7 +17,7 @@ enum Sentance // »ç¿ë ¿¹½Ã: string msg = Data.dataKey[COMMAND_HELP];
 	LOGIN_HI,
 	COMMAND_HELP,
 	USERLIST_HEADER,
-	HELP_LITTLE,//"\n\r¸í·É¾î¾È³»(H) Á¾·á(X)\n\r"
+	HELP_LITTLE,//"\n\rëª…ë ¹ì–´ì•ˆë‚´(H) ì¢…ë£Œ(X)\n\r"
 	ROOM_NUM_NOT_EXIST,
 	ROOM_MAX_CLNT,
 	ROOM_GEN,
@@ -48,7 +48,7 @@ public:
 		static Data s;
 		return s;
 	}
-	map<int,string> dataKey;
+	map<int, string> dataKey;
 
 	Data();
 

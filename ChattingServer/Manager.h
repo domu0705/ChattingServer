@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------------
-// Ã¤ÆÃ ½Ã½ºÅÛÀÇ ±â´É Á¦°ø
+// ì±„íŒ… ì‹œìŠ¤í…œì˜ ê¸°ëŠ¥ ì œê³µ
 // -----------------------------------------------------------------------------------
 #pragma once
 #pragma comment(lib, "Ws2_32.lib")
@@ -22,9 +22,9 @@ class Manager
 {
 private:
 	int roomIdx;
-	map<SOCKET, User*> userAry;//socket°ú client ¹­À» ÀÚ·áÇü
+	map<SOCKET, User*> userAry;//socketê³¼ client ë¬¶ì„ ìë£Œí˜•
 	map<string, User*> nameAry;
-	map<int,Room*> roomAry;
+	map<int, Room*> roomAry;
 	Data* Data;
 
 public:
@@ -39,7 +39,7 @@ public:
 
 	User* GetUserFromSock(SOCKET sockNum);
 	bool CanStoI(const string& str);
-	void SetUserToUserSockAry(SOCKET sockNum,User* user);
+	void SetUserToUserSockAry(SOCKET sockNum, User* user);
 	void LogIn(SOCKET sockNum, const string& id);
 	void ShowAllCommand(SOCKET sockNum);
 	void ShowUserList(SOCKET sockNum);
@@ -54,11 +54,11 @@ public:
 	void ExitRoom(SOCKET sockNum);
 	string GetCurTime();
 	void SendMsgToRoom(User* user, const string& msg);
-	void SendMsgToUser(SOCKET sockNum, const string& toUser, const string& msg);//ÂÊÁö º¸³»±â
+	void SendMsgToUser(SOCKET sockNum, const string& toUser, const string& msg);//ìª½ì§€ ë³´ë‚´ê¸°
 
 	void HandleState(int state, SOCKET* targetSocket, vector<string>& words, const string& msgBuffer);
 	void HandleWaiting(SOCKET* targetSocket, vector<string>& words);
 	void HandleLobby(SOCKET* targetSocket, vector<string>& words);
 	void HandleRoom(SOCKET* targetSocket, vector<string>& words, const string& msgBuffer);
-	
+
 };

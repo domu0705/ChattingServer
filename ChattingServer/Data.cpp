@@ -8,47 +8,47 @@ Data::Data()
 
 void Data::GenerateData()
 {
-	dataKey[Sentance_LT_HEADER]="------------------------- ´ëÈ­¹æ ¸ñ·Ï-------------------------- \n\r" ;
-	dataKey[Sentance_LT_BOUNDARY]="---------------------------------------------------------------\n\r¸í·É¾î¾È³»(H) Á¾·á(X)\n\r¼±ÅÃ>";
-	dataKey[LOGIN_ID_DUP]="**¾ÆÀÌµð¸¦ ÀÌ¹Ì »ç¿ëÁßÀÔ´Ï´Ù.´Ù¸¥ ¾ÆÀÌµð¸¦ »ç¿ëÇØÁÖ¼¼¿ä.\n\r";
-	dataKey[LOGIN_HI]="\r\n----------------------------------------------\n\r ¹Ý°©½À´Ï´Ù. ÅØ½ºÆ® Ã¤ÆÃ ¼­¹ö ver 0.1 ÀÔ´Ï´Ù.\n\r ÀÌ¿ëÁß ºÒÆíÇÏ½Å Á¡ÀÌ ÀÖÀ¸¸é ¾Æ·¡ ÀÌ¸ÞÀÏ·Î ¹®ÀÇ ¹Ù¶ø´Ï´Ù.\n\r °¨»çÇÕ´Ï´Ù.\n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r¸í·É¾î¾È³»(H) Á¾·á(X)\n\r";
-	dataKey[COMMAND_HELP]=
-"--------------------------------------------------------------- \n\r\
-H                         ¸í·É¾î ¾È³»\n\r\
-US                        ÀÌ¿ëÀÚ ¸ñ·Ï º¸±â\n\r\
-LT                        ´ëÈ­¹æ ¸ñ·Ï º¸±â\n\r\
-ST[¹æ¹øÈ£]                ´ëÈ­¹æ Á¤º¸ º¸±â\n\r\
-PF[»ó´ë¹æID]              ÀÌ¿ëÀÚ Á¤º¸ º¸±â\n\r\
-TO [»ó´ë¹æID] [¸Þ½ÃÁö]    ÂÊÁö º¸³»±â\n\r\
-O  [ÃÖ´ëÀÎ¿ø] [¹æÁ¦¸ñ]    ´ëÈ­¹æ ¸¸µé±â\n\r\
-J[¹æ¹øÈ£]                 ´ëÈ­¹æ Âü¿©ÇÏ±â\n\r\
-DEL                       ¹æ ÆøÆÄ(¹æ ³»ºÎ¿¡¼­ »ç¿ë)\n\r\
-Q                         ¹æ ³ª°¡±â(¹æ ³»ºÎ¿¡¼­ »ç¿ë)\n\r\
-X                         ³¡³»±â\n\r\
---------------------------------------------------------------- \n\r\
-¸í·É¾î¾È³»(H) Á¾·á(X)\n\r";
+	dataKey[Sentance_LT_HEADER] = "------------------------- ëŒ€í™”ë°© ëª©ë¡-------------------------- \r\n";
+	dataKey[Sentance_LT_BOUNDARY] = "---------------------------------------------------------------\r\nëª…ë ¹ì–´ì•ˆë‚´(H) ì¢…ë£Œ(X)\r\nì„ íƒ>";
+	dataKey[LOGIN_ID_DUP] = "**ì•„ì´ë””ë¥¼ ì´ë¯¸ ì‚¬ìš©ì¤‘ìž…ë‹ˆë‹¤.ë‹¤ë¥¸ ì•„ì´ë””ë¥¼ ì‚¬ìš©í•´ì£¼ì„¸ìš”.\r\n";
+	dataKey[LOGIN_HI] = "\r\n----------------------------------------------\r\n ë°˜ê°‘ìŠµë‹ˆë‹¤. í…ìŠ¤íŠ¸ ì±„íŒ… ì„œë²„ ver 0.1 ìž…ë‹ˆë‹¤.\r\n ì´ìš©ì¤‘ ë¶ˆíŽ¸í•˜ì‹  ì ì´ ìžˆìœ¼ë©´ ì•„ëž˜ ì´ë©”ì¼ë¡œ ë¬¸ì˜ ë°”ëžë‹ˆë‹¤.\r\n ê°ì‚¬í•©ë‹ˆë‹¤.\r\n programmed & arranged by Minjee Kim\r\n email: minjee.kim@nm-neo.com\r\n----------------------------------------------\r\nëª…ë ¹ì–´ì•ˆë‚´(H) ì¢…ë£Œ(X)\r\n";
+	dataKey[COMMAND_HELP] =
+		"--------------------------------------------------------------- \r\n\
+H                         ëª…ë ¹ì–´ ì•ˆë‚´\n\r\
+US                        ì´ìš©ìž ëª©ë¡ ë³´ê¸°\n\r\
+LT                        ëŒ€í™”ë°© ëª©ë¡ ë³´ê¸°\n\r\
+ST[ë°©ë²ˆí˜¸]                ëŒ€í™”ë°© ì •ë³´ ë³´ê¸°\n\r\
+PF[ìƒëŒ€ë°©ID]              ì´ìš©ìž ì •ë³´ ë³´ê¸°\n\r\
+TO [ìƒëŒ€ë°©ID] [ë©”ì‹œì§€]    ìª½ì§€ ë³´ë‚´ê¸°\n\r\
+O  [ìµœëŒ€ì¸ì›] [ë°©ì œëª©]    ëŒ€í™”ë°© ë§Œë“¤ê¸°\n\r\
+J[ë°©ë²ˆí˜¸]                 ëŒ€í™”ë°© ì°¸ì—¬í•˜ê¸°\n\r\
+DEL                       ë°© í­íŒŒ(ë°© ë‚´ë¶€ì—ì„œ ì‚¬ìš©)\n\r\
+Q                         ë°© ë‚˜ê°€ê¸°(ë°© ë‚´ë¶€ì—ì„œ ì‚¬ìš©)\n\r\
+X                         ëë‚´ê¸°\n\r\
+--------------------------------------------------------------- \r\n\
+ëª…ë ¹ì–´ì•ˆë‚´(H) ì¢…ë£Œ(X)\r\n";
 
-	dataKey[USERLIST_HEADER]="------------------------- ÀÌ¿ëÀÚ ¸ñ·Ï -------------------------\n\r";
-	dataKey[HELP_LITTLE]="\n\r¸í·É¾î¾È³»(H) Á¾·á(X)\n\r";
-	dataKey[ROOM_NUM_NOT_EXIST]="** ÇØ´ç ¹øÈ£ÀÇ ¹æÀº Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.\n\r";
-	dataKey[ROOM_MAX_CLNT]="** ´ëÈ­¹æ ÀÎ¿øÀ» 2 - 20¸í »çÀÌ·Î ÀÔ·ÂÇØÁÖ¼¼¿ä.\n\r";
-	dataKey[ROOM_GEN] = "** ´ëÈ­¹æÀÌ °³¼³µÇ¾ú½À´Ï´Ù.\n\r";
-	dataKey[ROOM_NOT_EXIST] = "** ÇØ´ç ¹æÀº Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù. ";
-	dataKey[ROOM_MAX] = "** ÀÎ¿øÀÌ ²Ë Â÷¼­ Âü¿©ÇÒ ¼ö ¾ø½À´Ï´Ù. ";
-	dataKey[IN_LOBBY] = "´ÔÀº ÇöÀç ·Îºñ¿¡ ÀÖ½À´Ï´Ù.\n\r";
-	dataKey[USER_INFO_NON] = "´ÔÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù..\n\r";
-	dataKey[THX] = "\r\n----------------------------------------------\n\r ÀÌ¿ëÇØÁÖ¼Å¼­ °¨»çÇÕ´Ï´Ù.\n\r ¿À´Ã ÇÏ·ç Çàº¹ÇÏ½Ã±æ ¹Ù¶ø´Ï´Ù :) \n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r";
-	dataKey[COMM_NOT_EXIST] = "\n\rÁ¸ÀçÇÏÁö ¾Ê´Â ¸í·ÉÀÔ´Ï´Ù. \n\r¸í·É¾î¾È³»(H) Á¾·á(X)\n\r";
-	dataKey[ROOM_DEL] = "\n\rÇØ´ç ¹æÀº ÆøÆÄµÇ¾ú½À´Ï´Ù. ·Îºñ·Î ÀÌµ¿ÇÕ´Ï´Ù.\n\r¸í·É¾î¾È³»(H) Á¾·á(X)\n\r";
-	dataKey[MYSELF_NO] = "\n\r** ÀÚ±â ÀÚ½Å¿¡°Ô´Â º¸³¾ ¼ö ¾ø½À´Ï´Ù.\n\r";
-	dataKey[SECR_SEND] = "\n\r** ÂÊÁö¸¦ º¸³Â½À´Ï´Ù.\n\r";
-	dataKey[SECR] = "´ÔÀÇ ÂÊÁö ==> ";
-	dataKey[USER_NOT_EXIST] = "\n\r** ÇØ´ç À¯Àú´Â Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.\n\r";
-	dataKey[OTHER_ENTERED] = "´ÔÀÌ µé¾î¿À¼Ì½À´Ï´Ù. (ÇöÀçÀÎ¿ø";
-	dataKey[ROOM_SENT_1] = "´ÔÀº ÇöÀç ÀÌ¸§ ";
-	dataKey[ROOM_SENT_2] = "ÀÎ Ã¤ÆÃ¹æ¿¡ ÀÖ½À´Ï´Ù.\n\r";
-	dataKey[Sentance_LT_HEADER] = "------------------------- ´ëÈ­¹æ ¸ñ·Ï-------------------------- \n\r";
-	dataKey[ROOM_LIST_INFO]= "------------------------- ´ëÈ­¹æ Á¤º¸ -------------------------\n\r";
-	dataKey[ROOM_EXIT] = "´ÔÀÌ ¹æÀ» ³ª°¡¼Ì½À´Ï´Ù.\n\r";
-	dataKey[HELLO] = "* * ¾È³çÇÏ¼¼¿ä.ÅØ½ºÆ® Ã¤ÆÃ ¼­¹ö ver 0.1ÀÔ´Ï´Ù.\n\r* * ·Î±×ÀÎ ¸í·É¾î(LOGIN)¸¦ »ç¿ëÇØÁÖ¼¼¿ä !\n\r";
+	dataKey[USERLIST_HEADER] = "------------------------- ì´ìš©ìž ëª©ë¡ -------------------------\r\n";
+	dataKey[HELP_LITTLE] = "\n\rëª…ë ¹ì–´ì•ˆë‚´(H) ì¢…ë£Œ(X)\n\r";
+	dataKey[ROOM_NUM_NOT_EXIST] = "** í•´ë‹¹ ë²ˆí˜¸ì˜ ë°©ì€ ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.\r\n";
+	dataKey[ROOM_MAX_CLNT] = "** ëŒ€í™”ë°© ì¸ì›ì„ 2 - 20ëª… ì‚¬ì´ë¡œ ìž…ë ¥í•´ì£¼ì„¸ìš”.\r\n";
+	dataKey[ROOM_GEN] = "** ëŒ€í™”ë°©ì´ ê°œì„¤ë˜ì—ˆìŠµë‹ˆë‹¤.\r\n";
+	dataKey[ROOM_NOT_EXIST] = "** í•´ë‹¹ ë°©ì€ ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. \r\n";
+	dataKey[ROOM_MAX] = "** ì¸ì›ì´ ê½‰ ì°¨ì„œ ì°¸ì—¬í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤. \r\n";
+	dataKey[IN_LOBBY] = "ë‹˜ì€ í˜„ìž¬ ë¡œë¹„ì— ìžˆìŠµë‹ˆë‹¤.\r\n";
+	dataKey[USER_INFO_NON] = "ë‹˜ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤..\n\r";
+	dataKey[THX] = "\n\r----------------------------------------------\r\n ì´ìš©í•´ì£¼ì…”ì„œ ê°ì‚¬í•©ë‹ˆë‹¤.\n\r ì˜¤ëŠ˜ í•˜ë£¨ í–‰ë³µí•˜ì‹œê¸¸ ë°”ëžë‹ˆë‹¤ :) \n\r programmed & arranged by Minjee Kim\n\r email: minjee.kim@nm-neo.com\n\r----------------------------------------------\n\r";
+	dataKey[COMM_NOT_EXIST] = "\n\rì¡´ìž¬í•˜ì§€ ì•ŠëŠ” ëª…ë ¹ìž…ë‹ˆë‹¤. \r\nëª…ë ¹ì–´ì•ˆë‚´(H) ì¢…ë£Œ(X)\n\r";
+	dataKey[ROOM_DEL] = "\n\rí•´ë‹¹ ë°©ì€ í­íŒŒë˜ì—ˆìŠµë‹ˆë‹¤. ë¡œë¹„ë¡œ ì´ë™í•©ë‹ˆë‹¤.\r\nëª…ë ¹ì–´ì•ˆë‚´(H) ì¢…ë£Œ(X)\n\r";
+	dataKey[MYSELF_NO] = "\n\r** ìžê¸° ìžì‹ ì—ê²ŒëŠ” ë³´ë‚¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\r\n";
+	dataKey[SECR_SEND] = "\n\r** ìª½ì§€ë¥¼ ë³´ëƒˆìŠµë‹ˆë‹¤.\r\n";
+	dataKey[SECR] = "ë‹˜ì˜ ìª½ì§€ ==> ";
+	dataKey[USER_NOT_EXIST] = "\n\r** í•´ë‹¹ ìœ ì €ëŠ” ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.\r\n";
+	dataKey[OTHER_ENTERED] = "ë‹˜ì´ ë“¤ì–´ì˜¤ì…¨ìŠµë‹ˆë‹¤. (í˜„ìž¬ì¸ì›";
+	dataKey[ROOM_SENT_1] = "ë‹˜ì€ í˜„ìž¬ ì´ë¦„ ";
+	dataKey[ROOM_SENT_2] = "ì¸ ì±„íŒ…ë°©ì— ìžˆìŠµë‹ˆë‹¤.\r\n";
+	dataKey[Sentance_LT_HEADER] = "------------------------- ëŒ€í™”ë°© ëª©ë¡-------------------------- \r\n";
+	dataKey[ROOM_LIST_INFO] = "------------------------- ëŒ€í™”ë°© ì •ë³´ -------------------------\r\n";
+	dataKey[ROOM_EXIT] = "ë‹˜ì´ ë°©ì„ ë‚˜ê°€ì…¨ìŠµë‹ˆë‹¤.\r\n";
+	dataKey[HELLO] = "* * ì•ˆë…•í•˜ì„¸ìš”.í…ìŠ¤íŠ¸ ì±„íŒ… ì„œë²„ ver 0.1ìž…ë‹ˆë‹¤.\n\r* * ë¡œê·¸ì¸ ëª…ë ¹ì–´(LOGIN)ë¥¼ ì‚¬ìš©í•´ì£¼ì„¸ìš” !\r\n";
 }

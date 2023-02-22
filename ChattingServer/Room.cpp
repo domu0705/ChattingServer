@@ -15,7 +15,7 @@ Room::Room(int idx, const string& roomName, const string& id, const string& time
 	Data = &Data::GetInstance();
 }
 
-void Room::EnterUser(User* user, const string& enterTime) // user´Â ÁøÂ¥ À¯ÀúÀÇ ÁÖ¼Ò°ª.
+void Room::EnterUser(User* user, const string& enterTime) // userëŠ” ì§„ì§œ ìœ ì €ì˜ ì£¼ì†Œê°’.
 {
 	userAry.insert(user);
 	user->SetRoom(name);
@@ -25,7 +25,7 @@ void Room::EnterUser(User* user, const string& enterTime) // user´Â ÁøÂ¥ À¯ÀúÀÇ 
 	++curClntNum;
 }
 
-void Room::ExitUser(User* user)// user´Â ÁøÂ¥ À¯ÀúÀÇ ÁÖ¼Ò°ª.
+void Room::ExitUser(User* user)// userëŠ” ì§„ì§œ ìœ ì €ì˜ ì£¼ì†Œê°’.
 {
 	if (!user) return;
 
@@ -51,7 +51,7 @@ int Room::GetCurClntNum()
 	return curClntNum;
 }
 
-int Room::GetMaxClntNum() 
+int Room::GetMaxClntNum()
 {
 	return maxClntNum;
 }
@@ -63,22 +63,22 @@ void Room::SetMaxClntNum(int num)
 
 string Room::GetCurRoomInfo()
 {
-	const string& header= Data->dataKey[ROOM_LIST_INFO];
-	const string& roomInfo = "[" + to_string(roomIdx+1) + "] (" + to_string(curClntNum) + "/"+ to_string(maxClntNum)+") "+name+"\n\r°³¼³½Ã°£: "+ genTime;
+	const string& header = Data->dataKey[ROOM_LIST_INFO];
+	const string& roomInfo = "[" + to_string(roomIdx + 1) + "] (" + to_string(curClntNum) + "/" + to_string(maxClntNum) + ") " + name + "\n\rê°œì„¤ì‹œê°„: " + genTime;
 	string peopleInfo = "";
 
-	for (auto iter = userAry.begin();iter!=userAry.end();iter++)
+	for (auto iter = userAry.begin();iter != userAry.end();iter++)
 	{
-		peopleInfo += "\n\rÂü¿©ÀÚ: "+ (*iter)->GetID() + "\t\t Âü¿©½Ã°£: " + (*iter)->GetRoomInTime();
+		peopleInfo += "\n\rì°¸ì—¬ìž: " + (*iter)->GetID() + "\t\t ì°¸ì—¬ì‹œê°„: " + (*iter)->GetRoomInTime();
 	}
-	const string& boundary= Data->dataKey[Sentance_LT_BOUNDARY];
-	const string& msg = format("{}{}{}\n\r{}", header,roomInfo,peopleInfo,boundary);
+	const string& boundary = Data->dataKey[Sentance_LT_BOUNDARY];
+	const string& msg = format("{}{}{}\n\r{}", header, roomInfo, peopleInfo, boundary);
 	return msg;
 }
 
 void Room::SendMsgToRoom(const string& msg)
 {
-	//¹æ¾ÈÀÇ ¸ðµç Å¬¶óÀÌ¾ðÆ®¿¡°Ô ¸Þ¼¼Áö º¸³»±â
+	//ë°©ì•ˆì˜ ëª¨ë“  í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ë©”ì„¸ì§€ ë³´ë‚´ê¸°
 	for (auto iter = userAry.begin();iter != userAry.end();iter++)
 	{
 		send((*iter)->GetSocket(), msg.c_str(), int(msg.size()), 0);
@@ -92,15 +92,15 @@ void Room::CloseRoom()
 
 void Room::ExitRoom(User* user)
 {
-	//¹æ ³ª°¬´Ù´Â ¸Þ¼¼Áö Àü¼Û
+	//ë°© ë‚˜ê°”ë‹¤ëŠ” ë©”ì„¸ì§€ ì „ì†¡
 	const string& msgInfo = format("{} {}", user->GetID(), Data->dataKey[ROOM_EXIT]);
 	SendMsgToRoom(msgInfo);
 
-	//¹æ ³ª°£ °³ÀÎ¿¡°Ô´Â µµ¿ò¸» ´Ù½Ã Àü´Þ
+	//ë°© ë‚˜ê°„ ê°œì¸ì—ê²ŒëŠ” ë„ì›€ë§ ë‹¤ì‹œ ì „ë‹¬
 	const string& msg = Data->dataKey[HELP_LITTLE];
 	send(user->GetSocket(), msg.c_str(), int(msg.size()), 0);
 
-	//½ÇÁ¦·Î ³ª°¡±â
+	//ì‹¤ì œë¡œ ë‚˜ê°€ê¸°
 	user->SetState(State::LOBBY);
 	userAry.erase(user);
 	--curClntNum;

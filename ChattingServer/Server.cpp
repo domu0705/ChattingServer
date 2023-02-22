@@ -1,7 +1,7 @@
 #include "Server.h"
 
 
-Server::Server() 
+Server::Server()
 {
 	manager = &Manager::GetInstance();
 }
@@ -52,14 +52,14 @@ void Server::StartConn()
 			continue;
 		}
 
-		for (int i = 0; i < int(reads.fd_count); ++i)//select°¡ 1 ÀÌ»ó ¹ÝÈ¯µÆÀ» ¶§ ½ÇÇàµÊ
+		for (int i = 0; i < int(reads.fd_count); ++i)//selectê°€ 1 ì´ìƒ ë°˜í™˜ëì„ ë•Œ ì‹¤í–‰ë¨
 		{
 			targetSocket = &reads.fd_array[i];
 			if (!FD_ISSET(*targetSocket, &cpyReads))
 			{
 				continue;
 			}
-			if (*targetSocket == servSock) // ¼­¹ö ¼ÒÄÏÀÇ º¯È­ È®ÀÎ(¸Â´Ù¸é ¿¬°á ¿äÃ»À» ¼ö¶ô)
+			if (*targetSocket == servSock) // ì„œë²„ ì†Œì¼“ì˜ ë³€í™” í™•ì¸(ë§žë‹¤ë©´ ì—°ê²° ìš”ì²­ì„ ìˆ˜ë½)
 			{
 				adrSz = sizeof(clntAddr);
 				clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &adrSz);
@@ -70,10 +70,10 @@ void Server::StartConn()
 
 				FD_SET(clntSock, &reads);
 
-				string msg = "* * ¾È³çÇÏ¼¼¿ä.ÅØ½ºÆ® Ã¤ÆÃ ¼­¹ö ver 0.1ÀÔ´Ï´Ù.\n\r* * ·Î±×ÀÎ ¸í·É¾î(LOGIN)¸¦ »ç¿ëÇØÁÖ¼¼¿ä !\n\r ";
+				string msg = "* * ì•ˆë…•í•˜ì„¸ìš”.í…ìŠ¤íŠ¸ ì±„íŒ… ì„œë²„ ver 0.1ìž…ë‹ˆë‹¤.\r\n* * ë¡œê·¸ì¸ ëª…ë ¹ì–´(LOGIN)ë¥¼ ì‚¬ìš©í•´ì£¼ì„¸ìš” !\r\n";
 				send(clntSock, msg.c_str(), int(msg.size()), 0);
 			}
-			else    // ¼ö½ÅÇÒ µ¥ÀÌÅÍ°¡ ÀÖÀ½. (read message)
+			else    // ìˆ˜ì‹ í•  ë°ì´í„°ê°€ ìžˆìŒ. (read message)
 			{
 				strLen = recv(*targetSocket, &c, sizeof(char), 0);
 				User* user = manager->GetUserFromSock(*targetSocket);
@@ -86,15 +86,23 @@ void Server::StartConn()
 				}
 				else if (c == '\n')
 				{
-					const string& msgBuf = user->buffer.substr(0, user->buffer.length() - 1);
-					vector<string> word = Split(msgBuf, ' ');
+					vector<string> word;
+					int startIndex = 0;
+					if (user->buffer[0] == 0)
+					{
+						user->buffer[0] = '.';
+						startIndex = 1;
+					}
 
-					if (word.size() == 0) //¿£ÅÍ¸¸ ÀÔ·Â¹ÞÀ½
+					const string& msgBuf = user->buffer.substr(startIndex, user->buffer.length() - 1);
+					word = Split(msgBuf, ' ');
+
+					if (word.size() == 0) //ì—”í„°ë§Œ ìž…ë ¥ë°›ìŒ
 					{
 						user->buffer.clear();
 						continue;
 					}
-					if (word[0].compare("X") == 0)//X : Á¾·á ¿äÃ»ÇÔ
+					if (word[0].compare("X") == 0)//X : ì¢…ë£Œ ìš”ì²­í•¨
 					{
 						manager->DisconnectUser(*targetSocket);
 						FD_CLR(*targetSocket, &reads);
