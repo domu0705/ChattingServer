@@ -98,14 +98,14 @@ void Manager::ShowRoomInfo(SOCKET sockNum, const string& idx)//ST :L 대화방 �
 
 	roomIndex = stoi(idx);
 
-	if (roomIndex > roomAry.size() || roomIndex < 1 || !roomAry[roomIndex - 1]->GetIsOpen())//방이 없거나 이미 닫혀있다면
+	if (roomAry.find(roomIndex)==roomAry.end() || roomAry[roomIndex]->GetIsOpen() == false)//방이 없거나 이미 닫혀있다면
 	{
 		const string& msg = Data->dataKey[ROOM_NUM_NOT_EXIST];
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 	else
 	{
-		const string& msg = roomAry[roomIndex - 1]->GetCurRoomInfo();
+		const string& msg = roomAry[roomIndex]->GetCurRoomInfo();
 		send(sockNum, msg.c_str(), int(msg.size()), 0);
 	}
 }

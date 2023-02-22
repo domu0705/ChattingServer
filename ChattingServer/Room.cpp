@@ -64,7 +64,7 @@ void Room::SetMaxClntNum(int num)
 string Room::GetCurRoomInfo()
 {
 	const string& header = Data->dataKey[ROOM_LIST_INFO];
-	const string& roomInfo = "[" + to_string(roomIdx + 1) + "] (" + to_string(curClntNum) + "/" + to_string(maxClntNum) + ") " + name + "\n\r개설시간: " + genTime;
+	const string& roomInfo = "[" + to_string(roomIdx ) + "] (" + to_string(curClntNum) + "/" + to_string(maxClntNum) + ") " + name + "\n\r개설시간: " + genTime;
 	string peopleInfo = "";
 
 	for (auto iter = userAry.begin();iter != userAry.end();iter++)
