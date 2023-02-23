@@ -78,7 +78,7 @@ void Server::StartConn()
 				strLen = recv(*targetSocket, &c, sizeof(char), 0);
 				User* user = manager->GetUserFromSock(*targetSocket);
 
-				if (strLen == 0)    // close request!
+				if (strLen <= 0)    // close request!
 				{
 					manager->DisconnectUser(*targetSocket);
 					FD_CLR(*targetSocket, &reads);

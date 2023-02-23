@@ -162,7 +162,7 @@ void Manager::MakeRoom(SOCKET sockNum, const string& maxClnt, const string& room
 		const string& str = Data->dataKey[ROOM_GEN];
 
 		send(sockNum, str.c_str(), int(str.size()), 0);
-		const string& msg = format("** {}{} {}/{} \r\n", user->GetID(), Data->dataKey[OTHER_ENTERED], roomAry[roomIdx]->GetCurClntNum(), roomAry[roomIdx]->GetMaxClntNum());
+		const string& msg = format("** {}{} {}/{}) \r\n", user->GetID(), Data->dataKey[OTHER_ENTERED], roomAry[roomIdx]->GetCurClntNum(), roomAry[roomIdx]->GetMaxClntNum());
 		roomAry[roomIdx]->SendMsgToRoom(msg);
 		++roomIdx;
 	}
